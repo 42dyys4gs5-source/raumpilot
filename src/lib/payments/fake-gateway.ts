@@ -48,6 +48,7 @@ export const fakeGateway: PaymentGateway = {
   async createConnectDashboardLink() {
     return null;
   },
+  async cancelSubscriptionNow() {},
   async retrieveAccount() {
     return { chargesEnabled: true, payoutsEnabled: true, detailsSubmitted: true };
   },

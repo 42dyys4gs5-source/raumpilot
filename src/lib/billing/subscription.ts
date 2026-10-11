@@ -1,4 +1,4 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, asc, eq, inArray, ne } from "drizzle-orm";
 import { db, schema, type DbOrTx } from "@/lib/db";
 import { appUrl, env } from "@/lib/env";
 import * as T from "@/lib/email/templates";
@@ -135,6 +135,17 @@ export async function syncSubscription(s: SubscriptionData) {
         .update(schema.organizations)
         .set({ planKey: plan.key, subscriptionStatus: s.status, stripeCustomerId: org.stripeCustomerId ?? s.customerId, updatedAt: new Date() })
         .where(eq(schema.organizations.id, org.id));
+    }
+
+    // Enforce room limits after a downgrade: newest published rooms beyond the limit go back to draft.
+    if (!ended) {
+      const published = await tx
+        .select({ id: schema.rooms.id })
+        .from(schema.rooms)
+        .where(and(eq(schema.rooms.orgId, org.id), eq(schema.rooms.status, "published")))
+        .orderBy(asc(schema.rooms.publishedAt));
+      const excess = published.slice(plan.maxRooms).map((r) => r.id);
+      if (excess.length) await tx.update(schema.rooms).set({ status: "draft" }).where(inArray(schema.rooms.id, excess));
     }
 
     const owner = await ownerContact(tx, org.id);

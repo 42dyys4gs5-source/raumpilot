@@ -497,7 +497,7 @@ export const bookings = pgTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     roomId: uuid("room_id")
       .notNull()
-      .references(() => rooms.id, { onDelete: "restrict" }),
+      .references(() => rooms.id, { onDelete: "no action" }),
     customerId: uuid("customer_id").references(() => customers.id, { onDelete: "set null" }),
     reference: text("reference").notNull().unique(),
     status: text("status", { enum: BOOKING_STATUSES }).notNull(),

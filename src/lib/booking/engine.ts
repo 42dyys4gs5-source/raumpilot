@@ -216,7 +216,7 @@ export type CreateBookingInput = BookingRequestInput & {
   customer: { name: string; email: string; phone?: string | null; company?: string | null; message?: string | null };
   source: "online" | "widget" | "manual";
   /** Set for bookings created by the landlord in the dashboard. */
-  manual?: { orgId: string; userId: string; ignoreRules: boolean; markPaid: boolean; internalNote?: string | null };
+  manual?: { orgId: string; userId: string; ignoreRules: boolean; markPaid: boolean; internalNote?: string | null; notifyCustomer?: boolean };
   now?: Date;
 };
 
@@ -387,7 +387,7 @@ async function createBookingTx(tx: Tx, input: CreateBookingInput, now: Date) {
     actor: manual ? `user:${manual.userId}` : "customer",
     data: { status, source: input.source },
   });
-  await N.notifyCreated(tx, booking.id);
+  if (!manual || manual.notifyCustomer !== false) await N.notifyCreated(tx, booking.id);
   return { booking, needsPayment: status === "pending_payment" };
 }
 

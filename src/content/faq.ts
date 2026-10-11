@@ -1,0 +1,17 @@
+export const FAQ: { q: string; a: string; group: string }[] = [
+  { group: "Allgemein", q: "Für wen ist Raumvia gedacht?", a: "Für alle, die Räume stunden- oder tageweise vermieten: Event- und Partyräume, Sitzungszimmer, Seminarräume, Fotostudios, Proberäume, Tanz- und Yogastudios, Gemeinschaftsräume und Ateliers – vom einzelnen Raum bis zu mehreren Standorten." },
+  { group: "Allgemein", q: "Brauche ich eine eigene Website?", a: "Nein. Sie erhalten eine eigene Buchungsseite mit Link und QR-Code. Wenn Sie eine Website haben, können Sie das Buchungsformular dort zusätzlich einbetten." },
+  { group: "Allgemein", q: "Ist Raumvia ein Marktplatz?", a: "Nein, in erster Linie eine Buchungssoftware für Ihre eigene Kundschaft. Optional können Sie Ihre Räume zusätzlich im öffentlichen Raumverzeichnis anzeigen lassen." },
+  { group: "Buchungen", q: "Wie verhindert Raumvia Doppelbuchungen?", a: "Jede Buchung wird in der Datenbank transaktionssicher geprüft und durch eine technische Sperre geschützt. Selbst wenn zwei Personen im selben Moment denselben Termin buchen, kann nur eine Buchung zustande kommen." },
+  { group: "Buchungen", q: "Kann ich Buchungen erst prüfen, bevor sie gelten?", a: "Ja. Stellen Sie den Raum auf «Buchungsanfrage». Sie nehmen jede Anfrage an oder lehnen sie ab; der Termin bleibt bis dahin reserviert." },
+  { group: "Buchungen", q: "Können Kunden selbst stornieren oder umbuchen?", a: "Ja, über den persönlichen Link in der Bestätigung. Es gelten Ihre Stornierungsbedingungen; Rückerstattungen erfolgen automatisch." },
+  { group: "Buchungen", q: "Funktionieren Buchungen über Mitternacht?", a: "Ja. Öffnungszeiten wie 18:00–03:00 sind möglich. Sommer- und Winterzeit werden korrekt berücksichtigt." },
+  { group: "Zahlungen", q: "Wie erhalte ich das Geld meiner Mieter?", a: "Über Ihr eigenes Stripe-Konto, das Sie mit Raumvia verbinden. Die Zahlungen gehen direkt an Sie. Alternativ rechnen Sie per Rechnung oder vor Ort ab." },
+  { group: "Zahlungen", q: "Wird TWINT unterstützt?", a: "TWINT steht über Stripe für Konten mit Sitz in der Schweiz und Zahlungen in CHF zur Verfügung. Sie aktivieren es in Ihrem Stripe-Dashboard; danach erscheint es automatisch im Zahlungsfenster." },
+  { group: "Zahlungen", q: "Welche Gebühren fallen an?", a: "Ihr Raumvia-Abo (ab CHF 39.– pro Monat). Für Onlinezahlungen belastet Stripe Ihnen die üblichen Transaktionsgebühren direkt. Raumvia erhebt derzeit keine Provision auf Buchungen." },
+  { group: "Abo", q: "Gibt es eine Mindestlaufzeit?", a: "Nein. Das Abo ist monatlich zum Ende der bezahlten Laufzeit kündbar." },
+  { group: "Abo", q: "Kann ich den Tarif wechseln?", a: "Jederzeit. Upgrades gelten sofort und werden anteilig verrechnet." },
+  { group: "Abo", q: "Was bedeutet «Fair Use» im Tarif Business?", a: "Der Tarif Business umfasst bis zu 25 Räume, 10 Standorte und 10 Teamzugänge. Brauchen Sie mehr, melden Sie sich – wir finden eine passende Lösung." },
+  { group: "Datenschutz", q: "Wo werden die Daten gespeichert?", a: "Die Datenbank wird in einem Rechenzentrum in Europa betrieben (Details in der Datenschutzerklärung). Daten werden verschlüsselt übertragen; Zahlungsdaten verarbeitet ausschliesslich Stripe." },
+  { group: "Datenschutz", q: "Kann ich meine Daten exportieren und mein Konto löschen?", a: "Ja. In den Einstellungen exportieren Sie alle Daten als Datei und können Ihr Konto selbst löschen." },
+];

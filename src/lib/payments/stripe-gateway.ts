@@ -136,6 +136,10 @@ export const stripeGateway: PaymentGateway = {
     return "https://dashboard.stripe.com/";
   },
 
+  async cancelSubscriptionNow(subscriptionId) {
+    await stripe().subscriptions.cancel(subscriptionId, { prorate: false });
+  },
+
   async retrieveAccount(accountId) {
     const a = await stripe().accounts.retrieve(accountId);
     return { chargesEnabled: !!a.charges_enabled, payoutsEnabled: !!a.payouts_enabled, detailsSubmitted: !!a.details_submitted };

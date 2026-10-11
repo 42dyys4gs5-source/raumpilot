@@ -22,6 +22,13 @@
       "when": 1791731032579,
       "tag": "0002_stripe_event_lock",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791732325537,
+      "tag": "0003_booking_room_fk",
+      "breakpoints": true
     }
   ]
 }

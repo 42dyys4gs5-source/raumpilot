@@ -252,6 +252,8 @@ export async function publishAction(_: ActionState, fd: FormData): Promise<Actio
   if (op === "publish") {
     const check = await publishChecklist(ctx.org, room);
     if (!check.ok) return fail("Bitte erledigen Sie zuerst alle Pflichtpunkte der Checkliste.");
+    const [{ n: live }] = await db.select({ n: count() }).from(schema.rooms).where(and(eq(schema.rooms.orgId, ctx.org.id), eq(schema.rooms.status, "published")));
+    if (live >= (ctx.plan?.maxRooms ?? 0)) return fail("Ihr Tarif erlaubt keine weiteren veröffentlichten Räume.");
     await db.update(schema.rooms).set({ status: "published", publishedAt: room.publishedAt ?? new Date(), updatedAt: new Date() }).where(eq(schema.rooms.id, room.id));
     await audit("room.published", { userId: ctx.user.id, orgId: ctx.org.id, data: { roomId: room.id } });
     revalidatePath(`/r/${room.slug}`);

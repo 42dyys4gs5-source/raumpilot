@@ -46,6 +46,7 @@ export interface PaymentGateway {
   createConnectOnboardingLink(p: { accountId: string; refreshUrl: string; returnUrl: string }): Promise<string>;
   createConnectDashboardLink(accountId: string): Promise<string | null>;
   retrieveAccount(accountId: string): Promise<AccountStatus>;
+  cancelSubscriptionNow(subscriptionId: string): Promise<void>;
 }
 
 export function gateway(): PaymentGateway {

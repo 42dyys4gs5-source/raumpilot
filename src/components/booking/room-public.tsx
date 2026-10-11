@@ -1,5 +1,4 @@
 import { Check, MapPin, Ruler, Users } from "lucide-react";
-import { BookingWidget } from "@/components/booking/booking-widget";
 import { durationOptions } from "@/lib/booking/availability";
 import { canTakeOnlinePayments } from "@/lib/booking/engine";
 import { describePolicy } from "@/lib/booking/policy";
