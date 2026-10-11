@@ -1,0 +1,18 @@
+export function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+    .replace(/-+$/g, "");
+}
+
+export const RESERVED_SLUGS = new Set([
+  "admin", "app", "api", "login", "registrieren", "preise", "hilfe", "kontakt", "r", "v", "embed", "buchung", "raeume", "www", "raumvia",
+]);

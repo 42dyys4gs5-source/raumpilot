@@ -1,0 +1,45 @@
+import { and, eq, inArray } from "drizzle-orm";
+import type { MetadataRoute } from "next";
+import { HELP_ARTICLES } from "@/content/help";
+import { LEGAL_DOCS } from "@/content/legal";
+import { SOLUTIONS } from "@/content/solutions";
+import { ACCESS_STATUSES } from "@/lib/billing/entitlements";
+import { db, schema } from "@/lib/db";
+import { appUrl } from "@/lib/env";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/registrieren"].map((p) => ({
+    url: appUrl(p),
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: p === "/" ? 1 : 0.7,
+  }));
+  let rooms: { slug: string; updatedAt: Date }[] = [];
+  let orgs: { slug: string }[] = [];
+  try {
+    rooms = await db
+      .select({ slug: schema.rooms.slug, updatedAt: schema.rooms.updatedAt })
+      .from(schema.rooms)
+      .innerJoin(schema.organizations, eq(schema.organizations.id, schema.rooms.orgId))
+      .where(and(eq(schema.rooms.status, "published"), inArray(schema.organizations.subscriptionStatus, [...ACCESS_STATUSES])));
+    orgs = await db
+      .selectDistinct({ slug: schema.organizations.slug })
+      .from(schema.organizations)
+      .innerJoin(schema.rooms, eq(schema.rooms.orgId, schema.organizations.id))
+      .where(and(eq(schema.rooms.status, "published"), inArray(schema.organizations.subscriptionStatus, [...ACCESS_STATUSES])));
+  } catch {
+    /* database unavailable – static entries only */
+  }
+  return [
+    ...statics,
+    ...SOLUTIONS.map((s) => ({ url: appUrl(`/loesungen/${s.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
+    ...HELP_ARTICLES.map((a) => ({ url: appUrl(`/hilfe/${a.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
+    ...LEGAL_DOCS.map((d) => ({ url: appUrl(`/rechtliches/${d.slug}`), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
+    ...rooms.map((r) => ({ url: appUrl(`/r/${r.slug}`), lastModified: r.updatedAt, changeFrequency: "weekly" as const, priority: 0.6 })),
+    ...orgs.map((o) => ({ url: appUrl(`/v/${o.slug}`), lastModified: now, changeFrequency: "weekly" as const, priority: 0.5 })),
+  ];
+}
