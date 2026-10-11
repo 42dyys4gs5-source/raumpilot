@@ -1,0 +1,1 @@
+ALTER TABLE "stripe_events" ADD COLUMN "locked_at" timestamp with time zone;
