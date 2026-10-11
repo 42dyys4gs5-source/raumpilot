@@ -16,9 +16,9 @@ import { customerCancelAction, customerRescheduleAction } from "./actions";
 export const metadata: Metadata = { title: "Ihre Buchung", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-export default async function ManageBookingPage({ params, searchParams }: { params: Promise<{ token: string }>; searchParams: Promise<{ zahlung?: string }> }) {
+export default async function ManageBookingPage({ params, searchParams }: { params: Promise<{ token: string }>; searchParams: Promise<{ zahlung?: string; storniert?: string }> }) {
   const { token } = await params;
-  const { zahlung } = await searchParams;
+  const { zahlung, storniert } = await searchParams;
   const d = await loadBookingByToken(token);
   if (!d) notFound();
   const { booking: b, room, org } = d;
@@ -46,6 +46,7 @@ export default async function ManageBookingPage({ params, searchParams }: { para
           <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">Buchung {b.reference}</h1>
           <div className="mt-2"><Badge tone={STATUS_TONE[b.status]}>{STATUS_LABEL[b.status]}</Badge></div>
         </div>
+        {storniert && b.status === "cancelled" && <Alert tone="success" title="Ihre Buchung wurde storniert.">{storniert === "erstattet" ? "Die Rückerstattung ist veranlasst. Die Gutschrift dauert je nach Bank 5–10 Bankarbeitstage." : "Sie erhalten eine Bestätigung per E-Mail."}</Alert>}
         {processing && <Alert tone="info" title="Zahlung wird bestätigt">Vielen Dank! Wir warten auf die Bestätigung des Zahlungsanbieters. Diese Seite aktualisiert sich automatisch.</Alert>}
         {zahlung === "abgebrochen" && payable && <Alert tone="warning" title="Zahlung abgebrochen">Die Zahlung wurde nicht abgeschlossen. Sie können es erneut versuchen, solange die Reservation gültig ist.</Alert>}
         {b.status === "confirmed" && zahlung === "erfolgreich" && <Alert tone="success" title="Zahlung erhalten – Buchung bestätigt">Eine Bestätigung mit allen Details ist per E-Mail unterwegs.</Alert>}

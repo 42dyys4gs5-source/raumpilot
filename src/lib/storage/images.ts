@@ -15,7 +15,7 @@ export async function storeImage(file: File, prefix: string, opts: { maxWidth?: 
   if (!file || file.size === 0) throw new UploadError("Bitte wählen Sie eine Bilddatei.");
   if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("Die Datei ist zu gross (max. 10 MB).");
   const input = Buffer.from(await file.arrayBuffer());
-  let meta: sharp.Metadata;
+  let meta: { format?: string };
   try {
     meta = await sharp(input, { limitInputPixels: 50_000_000 }).metadata();
   } catch {

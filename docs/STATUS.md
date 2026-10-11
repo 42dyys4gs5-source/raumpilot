@@ -27,6 +27,7 @@ Stand: Oktober 2026 · Branch `claude/raumpilot-saas-platform-xc7tge`
 | KI-Supportassistent | Nicht umgesetzt (optional) | Nur mit freigegebener Wissensbasis, ohne Aktionen |
 | Row-Level-Security | Isolation in der Anwendung (getestet) | Optional RLS als zusätzliche Schicht |
 | Bildvorschau-Galerie | Statische Galerie (bis 5 Bilder sichtbar) | Lightbox für alle Fotos |
+| Next.js 16 | Läuft auf Next.js 15.5 (unterstützt) | Upgrade (behebt PostCSS-Audit-Meldung) |
 
 ## Nützliche Befehle
 

@@ -20,7 +20,7 @@ test("Kunde bucht (Bezahlung vor Ort) und erhält Bestätigung; Vermieterin sieh
   const c = await bookFirstSlot(page, slug);
   await page.getByRole("button", { name: "Verbindlich buchen" }).click();
   await expect(page).toHaveURL(/\/buchung\//);
-  await expect(page.getByText("Bestätigt")).toBeVisible();
+  await expect(page.getByText("Bestätigt", { exact: true })).toBeVisible();
   const mails = await mailTemplates(c.email);
   expect(mails).toContain("booking.confirmed");
   expect((await mailTemplates(email))).toContain("landlord.new_booking");
@@ -48,7 +48,7 @@ test("Derselbe Termin kann nicht ein zweites Mal gebucht werden", async ({ page 
 test("Kunde storniert selbst über den Link", async ({ page }) => {
   const c = await bookFirstSlot(page, slug);
   await page.getByRole("button", { name: "Verbindlich buchen" }).click();
-  await expect(page.getByText("Bestätigt")).toBeVisible();
+  await expect(page.getByText("Bestätigt", { exact: true })).toBeVisible();
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Verbindlich stornieren" }).click();
   await expect(page.getByText("Ihre Buchung wurde storniert.")).toBeVisible();
@@ -77,13 +77,13 @@ test("Onlinezahlung: Stripe verbinden, bezahlen, Beleg, Stornierung mit Rückers
   await page.getByRole("button", { name: "Zahlung erfolgreich" }).click();
   await expect(page).toHaveURL(/zahlung=erfolgreich/);
   await expect(page.getByText("Zahlung erhalten – Buchung bestätigt")).toBeVisible();
-  await expect(page.getByText("Online bezahlt")).toBeVisible();
+  await expect(page.getByText("Online bezahlt", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Zahlungsbeleg" }).click();
   await expect(page.getByRole("heading", { name: "Zahlungsbeleg" }).or(page.getByText("Zahlungsbeleg").first())).toBeVisible();
   await page.goBack();
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Verbindlich stornieren" }).click();
-  await expect(page.getByText("Die Rückerstattung ist veranlasst.")).toBeVisible();
+  await expect(page.getByText(/Die Rückerstattung ist veranlasst/)).toBeVisible();
   await page.reload();
   await expect(page.getByText("Rückerstattet").first()).toBeVisible();
   const mails = await mailTemplates(c.email);
@@ -97,7 +97,7 @@ test("Zahlungsabbruch gibt den Termin wieder frei", async ({ page }) => {
   await expect(page).toHaveURL(/dev\/checkout/);
   await page.getByRole("button", { name: "Abbrechen (Sitzung abgelaufen)" }).click();
   await expect(page).toHaveURL(/zahlung=abgebrochen/);
-  await expect(page.getByText("Abgelaufen")).toBeVisible();
+  await expect(page.getByText("Abgelaufen", { exact: true })).toBeVisible();
   const rows = await db<{ status: string }[]>`SELECT status FROM bookings WHERE customer_email = ${c.email}`;
   expect(rows[0].status).toBe("expired");
 });
@@ -144,7 +144,7 @@ test("Abo: Kündigung zum Laufzeitende, Verlängerung und fehlgeschlagene Zahlun
   await page.goto("/app/abonnement");
   await page.getByRole("button", { name: /Tarif wechseln, Zahlungsmittel ändern oder kündigen/ }).click();
   await page.getByRole("button", { name: "Verlängerung simulieren (Zahlung OK)" }).click();
-  await expect(page.getByText("Bezahlt")).toBeVisible();
+  await expect(page.getByText("Bezahlt", { exact: true }).first()).toBeVisible();
   await page.getByRole("button", { name: /Tarif wechseln/ }).click();
   await page.getByRole("button", { name: "Fehlgeschlagene Zahlung simulieren" }).click();
   await expect(page.getByText("Zahlung offen").first()).toBeVisible();

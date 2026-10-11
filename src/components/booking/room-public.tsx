@@ -119,7 +119,7 @@ export function RoomDetails({ d }: { d: PublicRoom }) {
 export function Gallery({ d }: { d: PublicRoom }) {
   const photos = d.photos;
   if (!photos.length) {
-    return <div className="grid aspect-[16/7] place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-ink-100 text-ink-400">{CATEGORY_LABELS[d.room.category]}</div>;
+    return <div className="grid h-28 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-ink-100 text-sm text-ink-500">{CATEGORY_LABELS[d.room.category]} · Fotos folgen</div>;
   }
   const [first, ...rest] = photos;
   return (

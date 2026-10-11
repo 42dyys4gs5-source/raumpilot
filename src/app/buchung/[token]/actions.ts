@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { fail, success, type ActionState } from "@/lib/actions/types";
 import { BookingError, cancelBooking, rescheduleBooking } from "@/lib/booking/engine";
 import { verifyBookingToken } from "@/lib/booking/links";
@@ -14,15 +15,17 @@ export async function customerCancelAction(_: ActionState, fd: FormData): Promis
   if (!id) return fail("Ungültiger Link.");
   const { ip } = await requestInfo();
   if (!(await rateLimit(`cust-cancel:${ip}`, 10, 3600))) return fail("Zu viele Versuche.");
+  let refundDone = 0;
   try {
     const { refund } = await cancelBooking({ bookingId: id, by: "customer", actor: "customer", reason: String(fd.get("reason") ?? "").slice(0, 500) || null });
     kickJobs();
     revalidatePath(`/buchung/${token}`);
-    return success(refund > 0 ? "Ihre Buchung wurde storniert. Die Rückerstattung ist veranlasst." : "Ihre Buchung wurde storniert.");
+    refundDone = refund;
   } catch (e) {
     if (e instanceof BookingError) return fail(e.message);
     throw e;
   }
+  redirect(`/buchung/${token}?storniert=${refundDone > 0 ? "erstattet" : "1"}`);
 }
 
 export async function customerRescheduleAction(_: ActionState, fd: FormData): Promise<ActionState> {

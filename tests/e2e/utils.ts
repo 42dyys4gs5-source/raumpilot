@@ -49,6 +49,7 @@ export async function login(page: Page, email: string, password = "Sicher-Test-2
   await page.getByLabel("E-Mail-Adresse").fill(email);
   await page.getByLabel("Passwort", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Anmelden" }).click();
+  await page.waitForURL((u) => !u.pathname.endsWith("/login") || u.search.includes("fehler"), { timeout: 15_000 }).catch(() => {});
 }
 
 /** Complete landlord setup: org + published room with active plan (via fake checkout). Returns room slug. */
