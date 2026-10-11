@@ -15,15 +15,9 @@ Beim Domain-Anbieter ein E-Mail-Postfach `info@raumvia.ch` anlegen (meist CHF 1�
 Bei der **Ausgleichskasse Ihres Wohnkantons** anmelden (online; Liste: ahv-iv.ch › Kontakte › Kantonale Ausgleichskassen). Für ein Einzelunternehmen unter CHF 100’000 Umsatz ist **kein Handelsregistereintrag und keine MWST** nötig.
 Auftritt: Ihr Familienname muss im Firmennamen stehen, z. B. **«Max Muster, Raumvia»**.
 
-## 4. Supabase (10 Min., ca. USD 25/Monat)
-1. supabase.com › Sign up › **New project** · Name `raumvia` · Region **Zurich** (sonst Frankfurt) · Plan **Pro** · Datenbank-Passwort generieren lassen.
-2. **Storage** › New bucket › Name `media` › **Public bucket** einschalten.
-
-→ **Mir schicken** (z. B. als Datei, nicht öffentlich posten):
-- Project Settings › **Database** › Connection string › *Session pooler* (beginnt mit `postgresql://postgres.…`) inkl. Passwort
-- Project Settings › **API** › Project URL und `service_role`-Key
-
-Ich führe dann aus: Migrationen, Tarife, Ihr Admin-Konto (Skript `scripts/setup-production.ts`).
+## 4. Supabase ✅ erledigt (11.10.2026)
+Projekt `iuevxsswjnamlwwelfsv` (Region Zürich): 33 Tabellen, Tarife, Doppelbuchungsschutz, Bucket `media`. Der öffentliche Datenzugriff über die Supabase-API ist gesperrt (RLS aktiv, keine Rechte für `anon`/`authenticated`). Raumvia greift nur serverseitig zu.
+Noch offen: vor dem Livegang auf den Plan **Pro** wechseln (Backups) und den Access Token (`sbp_…`) unter Account › Access Tokens widerrufen.
 
 ## 5. Resend (10 Min., kostenlos)
 1. resend.com › Sign up › **Domains** › Add Domain › `raumvia.ch` › Region **EU (Frankfurt)**.
@@ -36,7 +30,7 @@ Ich führe dann aus: Migrationen, Tarife, Ihr Admin-Konto (Skript `scripts/setup
 ## 6. GitHub → Vercel (15 Min., ca. USD 20/Monat)
 1. Den Pull Request in GitHub zusammenführen («Merge») – Link schicke ich Ihnen.
 2. vercel.com › Sign up mit GitHub › Plan **Pro** › **Add New Project** › Repository `raumpilot` importieren.
-3. Vor dem ersten Deploy: *Environment Variables* › **Import .env** › die Datei **`vercel-umgebungsvariablen.env`** einfügen, die ich vorbereitet habe (Geheimschlüssel sind schon drin; die Supabase- und Resend-Werte ergänze ich nach Schritt 4/5).
+3. Vor dem ersten Deploy: *Environment Variables* › **Import .env** › die Datei **`vercel-umgebungsvariablen.env`** einfügen, die ich vorbereitet habe. Zwei Platzhalter ersetzen Sie selbst (per Kopieren, nicht abtippen): `HIER-DATENBANK-PASSWORT` (Supabase-Datenbankpasswort) und `HIER-SECRET-KEY-EINFUEGEN` (Supabase › Project Settings › API Keys › Secret key, Kopier-Symbol).
 4. **Deploy**.
 5. Project › Settings › **Domains** › `raumvia.ch` hinzufügen. Die angezeigten Einträge (meist `A` → `76.76.21.21` und `CNAME www` → `cname.vercel-dns.com`) beim Domain-Anbieter eintragen.
 
@@ -73,7 +67,6 @@ Impressum, Datenschutz, AGB, Nutzungsbedingungen und Auftragsbearbeitung einer F
 | Nach Schritt | Bitte schicken |
 |---|---|
 | 1 | Name des Domain-Anbieters |
-| 4 | Supabase: Connection String, Project URL, service_role-Key |
 | 5 | Resend API-Key |
 | 6 | Bestätigung «Vercel-Projekt angelegt» |
 | 7 | Name, Adresse, Telefon fürs Impressum |
