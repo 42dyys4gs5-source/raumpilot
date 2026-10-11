@@ -4,12 +4,11 @@ Alles, was ohne Ihre Konten möglich war, ist erledigt: Code, Tests, Datenbank- 
 
 ---
 
-## 1. Domain kontrollieren (2 Min.)
-`raumvia.ch` war am 11.10.2026 im .ch-Register (SWITCH) **noch nicht eingetragen**. Bitte im Konto Ihres Domain-Anbieters prüfen, ob die Bestellung abgeschlossen und bezahlt ist.
-→ **Mir sagen:** bei welchem Anbieter (z. B. Infomaniak, Hostpoint, Cyon, GoDaddy).
+## 1. Domain ✅ erledigt
+`raumvia.ch` ist registriert (Hostpoint, Nameserver `ns*.hostpoint.ch`).
 
-## 2. Postfach info@raumvia.ch (10 Min.)
-Beim Domain-Anbieter ein E-Mail-Postfach `info@raumvia.ch` anlegen (meist CHF 1–5/Monat). Raumvia verschickt E-Mails selbst; das Postfach brauchen Sie, um Antworten von Kunden und Supportanfragen zu lesen.
+## 2. Postfach info@raumvia.ch ✅ erledigt
+MX- und SPF-Einträge von Hostpoint sind aktiv. Raumvia verschickt E-Mails selbst über Resend; im Postfach lesen Sie Antworten von Kunden und Supportanfragen.
 
 ## 3. AHV-Anmeldung als Selbständige/r (15 Min.)
 Bei der **Ausgleichskasse Ihres Wohnkantons** anmelden (online; Liste: ahv-iv.ch › Kontakte › Kantonale Ausgleichskassen). Für ein Einzelunternehmen unter CHF 100’000 Umsatz ist **kein Handelsregistereintrag und keine MWST** nötig.
@@ -66,7 +65,6 @@ Impressum, Datenschutz, AGB, Nutzungsbedingungen und Auftragsbearbeitung einer F
 
 | Nach Schritt | Bitte schicken |
 |---|---|
-| 1 | Name des Domain-Anbieters |
 | 5 | Resend API-Key |
 | 6 | Bestätigung «Vercel-Projekt angelegt» |
 | 7 | Name, Adresse, Telefon fürs Impressum |
