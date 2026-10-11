@@ -4,6 +4,12 @@ import { env } from "@/lib/env";
 
 /** Storage abstraction: local disk (development) or Supabase Storage (production). */
 
+/** Supabase accepts legacy JWT service_role keys and new sb_secret_ keys; send both headers appropriately. */
+function supabaseHeaders(): Record<string, string> {
+  const k = env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return k.startsWith("eyJ") ? { apikey: k, Authorization: `Bearer ${k}` } : { apikey: k };
+}
+
 function safeKey(key: string): string {
   if (!/^[a-z0-9][a-z0-9/_.-]*$/i.test(key) || key.includes("..")) throw new Error("Ungültiger Dateipfad");
   return key;
@@ -15,7 +21,7 @@ export async function putObject(key: string, body: Buffer, contentType: string):
     const res = await fetch(`${env.SUPABASE_URL}/storage/v1/object/${env.SUPABASE_STORAGE_BUCKET}/${key}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        ...supabaseHeaders(),
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
         "x-upsert": "true",
@@ -35,7 +41,7 @@ export async function deleteObject(key: string): Promise<void> {
   if (env.STORAGE_DRIVER === "supabase") {
     await fetch(`${env.SUPABASE_URL}/storage/v1/object/${env.SUPABASE_STORAGE_BUCKET}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, "Content-Type": "application/json" },
+      headers: { ...supabaseHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify({ prefixes: [key] }),
     });
     return;
