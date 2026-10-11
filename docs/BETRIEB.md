@@ -26,7 +26,7 @@ Diese Anleitung führt Schritt für Schritt zur Live-Umgebung. Empfohlener Stack
 ## 3. E-Mail (Resend)
 
 1. Domain `raumvia.ch` in Resend hinzufügen und die angezeigten DNS-Einträge (SPF, DKIM, optional DMARC) beim Domain-Anbieter eintragen.
-2. API-Key erstellen → `RESEND_API_KEY`, `EMAIL_MODE=resend`, `EMAIL_FROM="Raumvia <noreply@raumvia.ch>"`, `EMAIL_REPLY_TO=support@raumvia.ch`.
+2. API-Key erstellen → `RESEND_API_KEY`, `EMAIL_MODE=resend`, `EMAIL_FROM="Raumvia <info@raumvia.ch>"`, `EMAIL_REPLY_TO=info@raumvia.ch`.
 3. `ADMIN_ALERT_EMAIL` auf Ihre Adresse setzen (Fehlerwarnungen, Monatsbericht, neue Supportanfragen).
 4. Empfohlener DMARC-Eintrag: `_dmarc TXT "v=DMARC1; p=quarantine; rua=mailto:dmarc@raumvia.ch"`.
 

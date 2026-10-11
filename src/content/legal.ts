@@ -11,6 +11,7 @@ export type LegalDoc = { slug: string; title: string; description: string; body:
 
 const MISSING = "[Angabe fehlt – im Admin-Bereich ergänzen]";
 const v = (s: string) => (s && s.trim() ? s : MISSING);
+const isSole = (op: OperatorInfo) => /einzel/i.test(op.legalForm);
 const addr = (op: OperatorInfo) => `${v(op.name)}${op.legalForm ? ` (${op.legalForm})` : ""}, ${v(op.street)}, ${v(op.postalCode)} ${v(op.city)}, ${op.country || "Schweiz"}`;
 
 export const LEGAL_DOCS: LegalDoc[] = [
@@ -19,10 +20,11 @@ export const LEGAL_DOCS: LegalDoc[] = [
     title: "Impressum",
     description: `Impressum von ${BRAND.name}.`,
     body: (op) => [
-      { h: "Betreiberin", p: addr(op) },
+      { h: "Betreiber", p: addr(op) },
+      ...(isSole(op) ? [{ p: `Inhaber/in: ${v(op.representative || op.name)}` }] : [{ p: `Vertretungsberechtigte Person: ${v(op.representative)}` }]),
       { p: `E-Mail: ${v(op.email)}${op.phone ? ` · Telefon: ${op.phone}` : ""}` },
-      { p: `Vertretungsberechtigte Person: ${v(op.representative)}` },
-      { p: `Unternehmens-Identifikationsnummer (UID): ${v(op.uid)}${op.vatRegistered ? ` · MWST-Nr.: ${v(op.vatNumber)}` : ""}` },
+      ...(op.uid ? [{ p: `Unternehmens-Identifikationsnummer (UID): ${op.uid}` }] : isSole(op) ? [{ p: "Einzelunternehmen, nicht im Handelsregister eingetragen." }] : [{ p: `UID: ${MISSING}` }]),
+      ...(op.vatRegistered ? [{ p: `MWST-Nr.: ${v(op.vatNumber)}` }] : []),
       { h: "Haftungsausschluss", p: "Wir prüfen die Inhalte dieser Website sorgfältig, übernehmen jedoch keine Gewähr für Richtigkeit, Vollständigkeit und Aktualität. Für Inhalte der Vermieterinnen und Vermieter (Raumbeschreibungen, Preise, Fotos, Bedingungen) sind ausschliesslich diese verantwortlich." },
       { h: "Haftung für Links", p: "Verweise auf Websites Dritter liegen ausserhalb unseres Verantwortungsbereichs. Wir lehnen jede Verantwortung für solche Websites ab." },
       { h: "Urheberrechte", p: `Die Rechte an Texten, Gestaltung und Software von ${BRAND.name} liegen bei der Betreiberin. Fotos und Texte auf Buchungsseiten stammen von den jeweiligen Vermieterinnen und Vermietern.` },

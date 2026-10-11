@@ -33,14 +33,14 @@ export default async function AdminSettings() {
             <ActionForm action={operatorAction}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Firma / Name" htmlFor="name"><Input id="name" name="name" defaultValue={op.name} /></Field>
-                <Field label="Rechtsform" htmlFor="legalForm"><Input id="legalForm" name="legalForm" defaultValue={op.legalForm} placeholder="z. B. GmbH, Einzelunternehmen" /></Field>
+                <Field label="Rechtsform" htmlFor="legalForm"><Input id="legalForm" name="legalForm" defaultValue={op.legalForm} placeholder="z. B. Einzelunternehmen, GmbH" /></Field>
                 <Field label="Strasse" htmlFor="street"><Input id="street" name="street" defaultValue={op.street} /></Field>
                 <div className="grid grid-cols-[90px_1fr] gap-2"><Field label="PLZ" htmlFor="postalCode"><Input id="postalCode" name="postalCode" defaultValue={op.postalCode} /></Field><Field label="Ort" htmlFor="city"><Input id="city" name="city" defaultValue={op.city} /></Field></div>
                 <Field label="Land" htmlFor="country"><Input id="country" name="country" defaultValue={op.country} /></Field>
                 <Field label="E-Mail" htmlFor="email"><Input id="email" name="email" defaultValue={op.email} /></Field>
                 <Field label="Telefon" htmlFor="phone" optional><Input id="phone" name="phone" defaultValue={op.phone} /></Field>
-                <Field label="Vertretungsberechtigt" htmlFor="representative"><Input id="representative" name="representative" defaultValue={op.representative} /></Field>
-                <Field label="UID" htmlFor="uid"><Input id="uid" name="uid" defaultValue={op.uid} placeholder="CHE-…" /></Field>
+                <Field label="Inhaber/in bzw. vertretungsberechtigt" htmlFor="representative"><Input id="representative" name="representative" defaultValue={op.representative} /></Field>
+                <Field label="UID" htmlFor="uid" optional hint="Leer lassen, wenn nicht im Handelsregister/MWST-Register."><Input id="uid" name="uid" defaultValue={op.uid} placeholder="CHE-…" /></Field>
                 <Field label="MWST-Nr." htmlFor="vatNumber" optional><Input id="vatNumber" name="vatNumber" defaultValue={op.vatNumber} /></Field>
               </div>
               <Checkbox name="vatRegistered" defaultChecked={op.vatRegistered} label="Betreiberin ist MWST-pflichtig (Abo-Preise inkl. 8.1 % MWST)" />

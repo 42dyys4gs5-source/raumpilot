@@ -25,7 +25,7 @@ const schema = z.object({
 
   EMAIL_MODE: z.enum(["resend", "log"]).default("log"),
   RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().default("Raumvia <noreply@raumvia.ch>"),
+  EMAIL_FROM: z.string().default("Raumvia <info@raumvia.ch>"),
   EMAIL_REPLY_TO: z.string().optional(),
   ADMIN_ALERT_EMAIL: z.string().email().optional(),
 

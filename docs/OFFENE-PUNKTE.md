@@ -6,8 +6,8 @@ Die Software ist entwickelt und getestet. Für den Livegang fehlen Zugänge, Fre
 
 | # | Punkt | Was zu tun ist |
 |---|---|---|
-| A1 | **Name & Domain** | `raumpilot.ch` ist vergeben (Raumpiloten GmbH, Architektur). Neuer Name **Raumvia**: `raumvia.ch`, `.swiss`, `.com`, `.de` waren bei der Prüfung frei. Domain `raumvia.ch` (ca. CHF 15–25/Jahr) bei einem Registrar Ihrer Wahl kaufen; optional `raumvia.com`. |
-| A2 | **Markenprüfung** | Vor Investitionen in Marketing: Recherche auf swissreg.ch (IGE) bzw. durch eine Fachperson, ob «Raumvia» in Klassen 9/42 (Software) frei ist; ggf. Marke anmelden (ab CHF 550). |
+| A1 | **Name & Domain** | ✅ `raumvia.ch` registriert, Adresse info@raumvia.ch. Optional zusätzlich `raumvia.com`. |
+| A2 | **Markenprüfung** | Vorabrecherche erledigt: keine Treffer in Swissreg und Zefix (siehe MARKENPRUEFUNG.md). Empfohlen: Marke beim IGE anmelden (ab CHF 550). |
 | A3 | Hosting-Plan | Vercel Pro (ca. USD 20/Monat) – gewerbliche Nutzung erfordert Pro. |
 | A4 | Datenbank-Plan | Supabase Pro (ca. USD 25/Monat), Region Zürich/EU. |
 | A5 | E-Mail | Resend-Konto (Free reicht für den Start). |
