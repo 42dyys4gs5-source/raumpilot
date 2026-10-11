@@ -32,10 +32,10 @@ function Op({ id, op, label, variant, confirm, children }: { id: string; op: str
   );
 }
 
-export default async function BookingDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ neu?: string }> }) {
+export default async function BookingDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ neu?: string; erledigt?: string }> }) {
   const ctx = await requireOrg();
   const { id } = await params;
-  const { neu } = await searchParams;
+  const { neu, erledigt } = await searchParams;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const [row] = await db
     .select({ b: schema.bookings, room: schema.rooms })
@@ -61,6 +61,11 @@ export default async function BookingDetail({ params, searchParams }: { params: 
         actions={<Link href={bookingUrl(b.id)} target="_blank" className="inline-flex items-center gap-1 text-sm text-brand-700 hover:underline">Kundenansicht <ExternalLink className="size-3.5" /></Link>}
       />
       {neu && <Alert tone="success" className="mb-4">Buchung erfasst.</Alert>}
+      {erledigt && (
+        <Alert tone="success" className="mb-4">
+          {{ approve: "Anfrage angenommen. Der Kunde wurde benachrichtigt.", decline: "Anfrage abgelehnt. Der Kunde wurde benachrichtigt.", cancel: "Buchung storniert. Der Kunde wurde benachrichtigt; allfällige Rückerstattungen sind veranlasst.", paid: "Als bezahlt markiert." }[erledigt] ?? "Erledigt."}
+        </Alert>
+      )}
       {b.calendarConflict && <Alert tone="error" className="mb-4" title="Kalenderkonflikt">Ein importierter externer Termin überschneidet sich mit dieser Buchung. Bitte prüfen Sie die Termine.</Alert>}
       {pendingRefund > 0 && (
         <Alert tone="warning" className="mb-4" title={`Rückerstattung über ${formatMoney(pendingRefund)} ausstehend`}>

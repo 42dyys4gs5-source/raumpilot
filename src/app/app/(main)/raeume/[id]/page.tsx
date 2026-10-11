@@ -35,10 +35,10 @@ const TABS = [
   { key: "veroeffentlichen", label: "Veröffentlichen" },
 ];
 
-export default async function RoomEditPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string; neu?: string }> }) {
+export default async function RoomEditPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string; neu?: string; status?: string }> }) {
   const ctx = await requireOrg("admin");
   const { id } = await params;
-  const { tab = "allgemein", neu } = await searchParams;
+  const { tab = "allgemein", neu, status } = await searchParams;
   const room = await getOrgRoom(ctx.org.id, id);
   if (!room) notFound();
   const check = await publishChecklist(ctx.org, room);
@@ -50,6 +50,8 @@ export default async function RoomEditPage({ params, searchParams }: { params: P
         description={<>{CATEGORY_LABELS[room.category]} · {room.status === "published" ? <Badge tone="green">Online buchbar</Badge> : room.status === "archived" ? <Badge>Archiviert</Badge> : <Badge tone="amber">Entwurf</Badge>}</>}
         actions={room.status === "published" ? <Link className="inline-flex items-center gap-1 text-sm text-brand-700 hover:underline" href={`/r/${room.slug}`} target="_blank">Öffentliche Seite <ExternalLink className="size-3.5" /></Link> : null}
       />
+      {status === "online" && room.status === "published" && <Alert tone="success" className="mb-4" title="Der Raum ist jetzt online buchbar.">Teilen Sie den Buchungslink oder QR-Code unter «Buchungsseite & QR-Code».</Alert>}
+      {status === "offline" && <Alert tone="info" className="mb-4">Der Raum ist nicht mehr öffentlich buchbar. Bestehende Buchungen bleiben bestehen.</Alert>}
       {neu && <Alert tone="success" className="mb-4" title="Raum erstellt">Ergänzen Sie nun Fotos, Preise und Zeiten. Unter «Veröffentlichen» schalten Sie den Raum online.</Alert>}
       <nav className="-mx-4 mb-6 flex gap-1 overflow-x-auto border-b border-ink-200 px-4 sm:mx-0 sm:px-0" aria-label="Raum-Bereiche">
         {TABS.map((t) => (

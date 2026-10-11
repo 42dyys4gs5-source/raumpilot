@@ -165,8 +165,9 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
   await db.update(schema.users).set({ failedLoginCount: 0, lockedUntil: null, lastLoginAt: new Date() }).where(eq(schema.users.id, user.id));
   await createSession(user.id);
   await audit("auth.login", { userId: user.id });
-  if (user.totpEnabledAt) redirect(`/login/mfa?next=${encodeURIComponent(next)}`);
-  redirect(user.isPlatformAdmin && next === "/app" ? "/admin" : next);
+  const target = user.isPlatformAdmin && next === "/app" ? "/admin" : next;
+  if (user.totpEnabledAt) redirect(`/login/mfa?next=${encodeURIComponent(target)}`);
+  redirect(target);
 }
 
 export async function mfaAction(_: ActionState, fd: FormData): Promise<ActionState> {

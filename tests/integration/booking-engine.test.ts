@@ -156,7 +156,11 @@ describe("online payment flow", () => {
     const { org } = await createOrg({ stripe: true });
     const room = await createRoom(org.id, { paymentMode: "online" });
     const { booking } = await book(room.id, future(6));
-    await expect(handleBookingPaid({ bookingId: booking.id, accountId: "acct_evil", paymentIntentId: "pi_x", amount: 1 })).rejects.toThrow();
+    await handleBookingPaid({ bookingId: booking.id, accountId: "acct_evil", paymentIntentId: "pi_x", amount: 1 });
+    const [b] = await db.select().from(schema.bookings).where(eq(schema.bookings.id, booking.id));
+    expect(b.status).toBe("pending_payment");
+    const logs = await db.select().from(schema.auditLog).where(eq(schema.auditLog.action, "payment.account_mismatch"));
+    expect(logs).toHaveLength(1);
   });
 
   it("releases expired holds so the slot becomes bookable again", async () => {

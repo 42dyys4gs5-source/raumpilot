@@ -257,12 +257,12 @@ export async function publishAction(_: ActionState, fd: FormData): Promise<Actio
     await db.update(schema.rooms).set({ status: "published", publishedAt: room.publishedAt ?? new Date(), updatedAt: new Date() }).where(eq(schema.rooms.id, room.id));
     await audit("room.published", { userId: ctx.user.id, orgId: ctx.org.id, data: { roomId: room.id } });
     revalidatePath(`/r/${room.slug}`);
-    return done(room.id, "Der Raum ist jetzt online buchbar.");
+    redirect(`/app/raeume/${room.id}?tab=veroeffentlichen&status=online`);
   }
   if (op === "unpublish") {
     await db.update(schema.rooms).set({ status: "draft", updatedAt: new Date() }).where(eq(schema.rooms.id, room.id));
     revalidatePath(`/r/${room.slug}`);
-    return done(room.id, "Der Raum ist nicht mehr öffentlich buchbar. Bestehende Buchungen bleiben bestehen.");
+    redirect(`/app/raeume/${room.id}?tab=veroeffentlichen&status=offline`);
   }
   if (op === "archive") {
     await db.update(schema.rooms).set({ status: "archived", updatedAt: new Date() }).where(eq(schema.rooms.id, room.id));

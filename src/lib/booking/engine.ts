@@ -448,7 +448,11 @@ export async function handleBookingPaid(p: { bookingId: string; accountId: strin
     const [b] = await tx.select().from(schema.bookings).where(eq(schema.bookings.id, p.bookingId)).for("update");
     if (!b) throw new Error(`Buchung ${p.bookingId} nicht gefunden`);
     const [org] = await tx.select().from(schema.organizations).where(eq(schema.organizations.id, b.orgId));
-    if (org.stripeAccountId !== p.accountId) throw new Error("Zahlung stammt nicht vom Konto des Vermieters");
+    if (org.stripeAccountId !== p.accountId) {
+      // Never confirm, but do not make Stripe retry forever either: record as security event.
+      await tx.insert(schema.auditLog).values({ action: "payment.account_mismatch", orgId: b.orgId, severity: "critical", data: { bookingId: b.id, account: p.accountId } });
+      return false;
+    }
 
     const inserted = await tx
       .insert(schema.payments)

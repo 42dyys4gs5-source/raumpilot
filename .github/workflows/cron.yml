@@ -1,0 +1,17 @@
+# Runs the background worker every 5 minutes (free alternative to per-minute Vercel Cron on the Pro plan).
+# Requires repository secrets APP_URL and CRON_SECRET.
+name: Cron worker
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    if: ${{ vars.CRON_ENABLED == 'true' }}
+    steps:
+      - name: Trigger worker
+        run: |
+          curl -fsS --max-time 70 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.APP_URL }}/api/cron/run"

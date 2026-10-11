@@ -1,6 +1,8 @@
 import { Mail } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Turnstile } from "@/components/ui/turnstile";
+import { env } from "@/lib/env";
 import { ActionForm, SubmitButton } from "@/components/ui/action-form";
 import { BotFields, Checkbox, Field, Input, Textarea } from "@/components/ui/form";
 import { PageHero } from "@/components/marketing/page-hero";
@@ -31,6 +33,7 @@ export default function ContactPage() {
               <Field label="Betreff" htmlFor="subject" optional><Input id="subject" name="subject" /></Field>
               <Field label="Nachricht" htmlFor="message"><Textarea id="message" name="message" rows={6} required /></Field>
               <Checkbox name="privacy" required label={<>Ich bin einverstanden, dass meine Angaben zur Beantwortung gespeichert werden (<Link href="/rechtliches/datenschutz" className="underline">Datenschutz</Link>).</>} />
+        <Turnstile siteKey={env.TURNSTILE_SITE_KEY} />
               <SubmitButton>Nachricht senden</SubmitButton>
             </ActionForm>
           </div>

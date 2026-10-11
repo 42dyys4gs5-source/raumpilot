@@ -92,37 +92,28 @@ async function act(fd: FormData) {
 export default async function FakeCheckout({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
   guard();
   const sp = await searchParams;
-  const hidden = (o: Record<string, string | undefined>) => Object.entries(o).map(([k, v]) => <input key={k} type="hidden" name={k} value={v ?? ""} />);
-  const Btn = ({ op, label, back, tone = "bg-brand-700 text-white" }: { op: string; label: string; back: string; tone?: string }) => (
-    <button name="op" value={op} formAction={act} className={`h-11 rounded-lg px-4 text-sm font-medium ${tone}`} type="submit" data-back={back}>{label}</button>
-  );
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
       <div className="rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
         <strong>Testmodus.</strong> Diese Seite simuliert den Zahlungsanbieter (Stripe) für automatisierte Tests. Es fliesst kein Geld.
       </div>
       {sp.kind === "booking" && (
-        <form className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4">
           <h1 className="text-2xl font-semibold">Testzahlung {formatMoney(Number(sp.amount))}</h1>
-          {hidden({ booking: sp.booking, account: sp.account, amount: sp.amount, session: sp.session })}
-          <div className="flex flex-wrap gap-2">
-            <input type="hidden" name="back" value={sp.success} />
-            <Btn op="pay" label="Zahlung erfolgreich" back={sp.success} />
-          </div>
+          <FormBack back={sp.success} op="pay" label="Zahlung erfolgreich" primary hiddenFields={{ booking: sp.booking, account: sp.account, amount: sp.amount, session: sp.session }} />
           <div className="flex flex-wrap gap-2 border-t pt-4">
             <FormBack back={sp.cancel} op="fail" label="Zahlung fehlgeschlagen" hiddenFields={{ booking: sp.booking, account: sp.account, session: sp.session }} />
             <FormBack back={sp.cancel} op="expire" label="Abbrechen (Sitzung abgelaufen)" hiddenFields={{ booking: sp.booking, account: sp.account, session: sp.session }} />
             <a href={sp.cancel} className="inline-flex h-11 items-center rounded-lg px-4 text-sm ring-1 ring-ink-200">Zurück (Abbruch)</a>
           </div>
-        </form>
+        </div>
       )}
       {sp.kind === "subscription" && (
-        <form className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4">
           <h1 className="text-2xl font-semibold">Test-Abo: {sp.plan}</h1>
-          {hidden({ org: sp.org, plan: sp.plan, session: sp.session, back: sp.success })}
-          <Btn op="subscribe" label="Abo abschliessen" back={sp.success} />
-          <a href={sp.cancel} className="ml-2 text-sm underline">Abbrechen</a>
-        </form>
+          <FormBack back={sp.success} op="subscribe" label="Abo abschliessen" primary hiddenFields={{ org: sp.org, plan: sp.plan, session: sp.session }} />
+          <a href={sp.cancel} className="text-sm underline">Abbrechen</a>
+        </div>
       )}
       {sp.kind === "portal" && (
         <div className="mt-6 space-y-3">
@@ -146,13 +137,13 @@ export default async function FakeCheckout({ searchParams }: { searchParams: Pro
   );
 }
 
-function FormBack({ back, op, label, hiddenFields }: { back: string; op: string; label: string; hiddenFields: Record<string, string | undefined> }) {
+function FormBack({ back, op, label, hiddenFields, primary }: { back: string; op: string; label: string; hiddenFields: Record<string, string | undefined>; primary?: boolean }) {
   return (
     <form action={act}>
       <input type="hidden" name="op" value={op} />
       <input type="hidden" name="back" value={back} />
       {Object.entries(hiddenFields).map(([k, v]) => <input key={k} type="hidden" name={k} value={v ?? ""} />)}
-      <button type="submit" className="h-11 rounded-lg px-4 text-sm font-medium ring-1 ring-ink-300 hover:bg-ink-50">{label}</button>
+      <button type="submit" className={primary ? "h-11 rounded-lg bg-brand-700 px-4 text-sm font-medium text-white" : "h-11 rounded-lg px-4 text-sm font-medium ring-1 ring-ink-300 hover:bg-ink-50"}>{label}</button>
     </form>
   );
 }

@@ -2,6 +2,7 @@
 
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, Loader2, Lock, Minus, Plus, Users } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils/cn";
 
 export type WidgetExtra = { id: string; name: string; description: string | null; price: number; pricing: "per_booking" | "per_hour" | "per_person" | "per_unit"; maxQuantity: number };
@@ -19,6 +20,7 @@ type Props = {
   hasTerms: boolean;
   embed?: boolean;
   accent?: string | null;
+  turnstileSiteKey?: string | null;
 };
 
 type PriceLine = { label: string; amount: number; kind: string };
@@ -66,6 +68,7 @@ export function BookingWidget(p: Props) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const [accept, setAccept] = useState(false);
   const [hp, setHp] = useState("");
+  const [captcha, setCaptcha] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
@@ -167,6 +170,7 @@ export function BookingWidget(p: Props) {
           acceptTerms: true,
           source: p.embed ? "widget" : "online",
           website_hp: hp || undefined,
+          turnstileToken: captcha,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -361,6 +365,7 @@ export function BookingWidget(p: Props) {
         </label>
       </section>
 
+      <Turnstile siteKey={p.turnstileSiteKey} onToken={setCaptcha} />
       {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>}
       <button type="submit" disabled={submitting || !start || !!quoteError} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand-700 font-semibold text-white shadow-sm transition hover:bg-brand-800 disabled:opacity-50" style={p.accent ? { background: p.accent } : undefined}>
         {submitting && <Loader2 className="size-4 animate-spin" />} {ctaLabel}

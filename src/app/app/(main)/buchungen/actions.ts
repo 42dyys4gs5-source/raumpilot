@@ -90,6 +90,8 @@ export async function bookingAction(_: ActionState, fd: FormData): Promise<Actio
   if (res.ok) await audit(`booking.${op}`, { userId: ctx.user.id, orgId: ctx.org.id, data: { bookingId: id } });
   revalidatePath(`/app/buchungen/${id}`);
   revalidatePath("/app/buchungen");
+  // These operations replace the form that would show the message – show it on the page instead.
+  if (res.ok && ["approve", "decline", "cancel", "paid"].includes(op)) redirect(`/app/buchungen/${id}?erledigt=${op}`);
   return res;
 }
 

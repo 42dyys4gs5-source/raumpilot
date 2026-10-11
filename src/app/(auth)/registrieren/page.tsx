@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Turnstile } from "@/components/ui/turnstile";
 import { ActionForm, FieldError, SubmitButton } from "@/components/ui/action-form";
 import { BotFields, Checkbox, Field, Input, Select } from "@/components/ui/form";
 import { env } from "@/lib/env";
@@ -84,6 +85,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           }
         />
         <FieldError name="terms" />
+        <Turnstile siteKey={env.TURNSTILE_SITE_KEY} />
         <SubmitButton className="w-full" size="lg" pendingText="Konto wird erstellt …">Konto erstellen</SubmitButton>
         <p className="text-center text-xs text-ink-500">Den Tarif wählen Sie nach der Einrichtung Ihres ersten Raums.</p>
       </ActionForm>

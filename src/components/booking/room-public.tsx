@@ -1,5 +1,6 @@
 import { Check, MapPin, Ruler, Users } from "lucide-react";
 import { durationOptions } from "@/lib/booking/availability";
+import { env } from "@/lib/env";
 import { canTakeOnlinePayments } from "@/lib/booking/engine";
 import { describePolicy } from "@/lib/booking/policy";
 import type { PublicRoom } from "@/lib/booking/public";
@@ -22,6 +23,7 @@ export function widgetProps(d: PublicRoom, embed = false) {
     hasTerms: !!d.room.rentalTerms,
     embed,
     accent: d.branding ? d.org.brandColor : null,
+    turnstileSiteKey: env.TURNSTILE_SITE_KEY ?? null,
   };
 }
 
