@@ -21,7 +21,9 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm run lint && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "setup:production": "tsx scripts/setup-production.ts",
+    "setup:stripe": "tsx scripts/stripe-setup.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

@@ -44,6 +44,7 @@ npm run test:e2e       # Playwright gegen den Produktions-Build (Test-Zahlungsmo
 
 | Dokument | Inhalt |
 |---|---|
+| [docs/IHRE-SCHRITTE.md](docs/IHRE-SCHRITTE.md) | **Ihre verbleibenden Schritte bis zum Livegang** |
 | [docs/STATUS.md](docs/STATUS.md) | Entwicklungsstand, bekannte Grenzen, nächste Aufgaben |
 | [docs/OFFENE-PUNKTE.md](docs/OFFENE-PUNKTE.md) | **Was Sie noch tun bzw. freigeben müssen** (Zugänge, Domain, Recht) |
 | [docs/BETRIEB.md](docs/BETRIEB.md) | Produktivsetzung, Stripe/Resend/Supabase/Vercel, DNS, Cron, Backups, Wiederherstellung |
