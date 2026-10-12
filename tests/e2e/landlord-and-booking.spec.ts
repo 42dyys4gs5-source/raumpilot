@@ -79,8 +79,11 @@ test("Onlinezahlung: Stripe verbinden, bezahlen, Beleg, Stornierung mit Rückers
   await expect(page.getByText("Zahlung erhalten – Buchung bestätigt")).toBeVisible();
   await expect(page.getByText("Online bezahlt", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Zahlungsbeleg" }).click();
-  await expect(page.getByRole("heading", { name: "Zahlungsbeleg" }).or(page.getByText("Zahlungsbeleg").first())).toBeVisible();
+  // Wait for the receipt to actually load – otherwise goBack() races the navigation and lands on the checkout page.
+  await expect(page).toHaveURL(/\/beleg/);
+  await expect(page.getByText("Zahlungsbeleg").first()).toBeVisible();
   await page.goBack();
+  await expect(page).toHaveURL(/\/buchung\/[^/]+$|\/buchung\/[^/]+\?/);
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Verbindlich stornieren" }).click();
   await expect(page.getByText(/Die Rückerstattung ist veranlasst/)).toBeVisible();

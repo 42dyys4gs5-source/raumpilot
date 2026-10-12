@@ -5,6 +5,7 @@ import { ActionForm, SubmitButton } from "@/components/ui/action-form";
 import { Alert, Badge, Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Field, Textarea } from "@/components/ui/form";
 import { ButtonLink } from "@/components/ui/button";
+import { PaymentStatusRefresh } from "@/components/booking/payment-status-refresh";
 import { RescheduleForm } from "@/components/booking/reschedule-form";
 import { loadBookingByToken } from "@/lib/booking/customer";
 import { PAYMENT_LABEL, STATUS_LABEL, STATUS_TONE } from "@/lib/booking/labels";
@@ -39,7 +40,7 @@ export default async function ManageBookingPage({ params, searchParams }: { para
 
   return (
     <div className="min-h-dvh bg-ink-50 py-8 sm:py-12">
-      {processing && <meta httpEquiv="refresh" content="4" />}
+      {processing && <PaymentStatusRefresh />}
       <div className="container-page max-w-3xl space-y-6">
         <div>
           <p className="text-sm text-ink-500">{org.name}</p>
