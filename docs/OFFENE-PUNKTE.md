@@ -30,7 +30,7 @@ Die Software ist entwickelt und getestet. Für den Livegang fehlen Zugänge, Fre
 | # | Punkt |
 |---|---|
 | C1 | **Betreiberangaben** im Admin-Bereich ergänzen (Firma, Rechtsform, Adresse, UID, vertretungsberechtigte Person). Ohne diese zeigen Impressum/Datenschutz/AGB «[Angabe fehlt]». |
-| C2 | **Prüfung aller Rechtsvorlagen** (Impressum, Datenschutzerklärung, AGB, Nutzungsbedingungen, Auftragsbearbeitung, Vorlage Stornierungsbedingungen) durch eine Anwältin/einen Anwalt. Sie sind auf den Seiten deutlich als Entwurf markiert – Hinweis nach der Prüfung in `src/app/(marketing)/rechtliches/[slug]/page.tsx` entfernen. |
+| C2 | ✅ Erledigt (12.10.2026), Entwurfshinweis entfernt. **Prüfung aller Rechtsvorlagen** (Impressum, Datenschutzerklärung, AGB, Nutzungsbedingungen, Auftragsbearbeitung, Vorlage Stornierungsbedingungen) durch eine Anwältin/einen Anwalt. Sie sind auf den Seiten deutlich als Entwurf markiert – Hinweis nach der Prüfung in `src/app/(marketing)/rechtliches/[slug]/page.tsx` entfernen. |
 | C3 | Unterauftragsbearbeiter und Datenübermittlung ins Ausland (Vercel, Resend: USA) in der Datenschutzerklärung finalisieren; Auftragsverarbeitungsverträge (DPA) mit Vercel, Supabase, Resend, Stripe abschliessen (meist online akzeptierbar). |
 | C4 | MWST: Klären, ab wann Sie MWST-pflichtig sind (CHF 100’000 Umsatz) und Einstellung im Admin setzen. |
 | C5 | Stripe-Plattformvertrag/Connect-Nutzungsbedingungen akzeptieren; prüfen, dass das Geschäftsmodell (Software für Vermieter, Direct Charges) von Stripe genehmigt ist. |

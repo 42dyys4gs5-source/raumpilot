@@ -59,11 +59,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="px-3">{userBox}</div>
         </aside>
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-ink-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
-            <MobileNav badges={badges} header={<Logo href="/app" />} />
-            <Logo href="/app" />
+          <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-ink-200 bg-white px-3 py-2 lg:hidden">
+            <MobileNav badges={badges} header={<Logo href="/app" />} footer={userBox} />
           </header>
-          <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
+          <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
         </div>
       </div>
     </div>
