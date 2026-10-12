@@ -12,7 +12,11 @@ export const sql =
   globalThis.__rvSql ??
   postgres(env.DATABASE_URL, {
     max: env.DATABASE_POOL_MAX,
-    idle_timeout: 20,
+    // On Vercel every function instance holds its own pool, and the Supabase session pooler only has
+    // a small number of slots: release idle connections quickly and recycle them regularly.
+    idle_timeout: process.env.VERCEL ? 5 : 20,
+    max_lifetime: 60 * 10,
+    connect_timeout: 10,
     // Supabase transaction pooler (port 6543) does not support prepared statements.
     prepare: !env.DATABASE_URL.includes(":6543"),
     onnotice: () => {},
