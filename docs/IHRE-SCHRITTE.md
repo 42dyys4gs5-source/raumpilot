@@ -18,22 +18,12 @@ Auftritt: Ihr Familienname muss im Firmennamen stehen, z. B. **«Max Muster, Rau
 Projekt `iuevxsswjnamlwwelfsv` (Region Zürich): 33 Tabellen, Tarife, Doppelbuchungsschutz, Bucket `media`. Der öffentliche Datenzugriff über die Supabase-API ist gesperrt (RLS aktiv, keine Rechte für `anon`/`authenticated`). Raumvia greift nur serverseitig zu.
 Noch offen: vor dem Livegang auf den Plan **Pro** wechseln (Backups) und den Access Token (`sbp_…`) unter Account › Access Tokens widerrufen.
 
-## 5. Resend (10 Min., kostenlos)
-1. resend.com › Sign up › **Domains** › Add Domain › `raumvia.ch` › Region **EU (Frankfurt)**.
-2. Resend zeigt 3–4 DNS-Einträge (MX/TXT auf `send.raumvia.ch` und `resend._domainkey`). Diese beim Domain-Anbieter eintragen – sie stören Ihr Postfach nicht.
-3. Zusätzlich eintragen: `TXT` · Name `_dmarc` · Wert `v=DMARC1; p=quarantine; rua=mailto:info@raumvia.ch`
-4. **API Keys** › Create (Permission: Sending access).
+## 5. Resend ✅ erledigt
+Domain `raumvia.ch` mit DKIM/SPF-Einträgen bei Hostpoint eingetragen (Region EU), API-Key in Vercel hinterlegt.
 
-→ **Mir schicken:** den API-Key (`re_…`). Ich prüfe die DNS-Einträge.
-
-## 6. GitHub → Vercel (15 Min., ca. USD 20/Monat)
-1. Den Pull Request in GitHub zusammenführen («Merge») – Link schicke ich Ihnen.
-2. vercel.com › Sign up mit GitHub › Plan **Pro** › **Add New Project** › Repository `raumpilot` importieren.
-3. Vor dem ersten Deploy: *Environment Variables* › **Import .env** › die Datei **`vercel-umgebungsvariablen.env`** einfügen, die ich vorbereitet habe. Zwei Platzhalter ersetzen Sie selbst (per Kopieren, nicht abtippen): `HIER-DATENBANK-PASSWORT` (Supabase-Datenbankpasswort) und `HIER-SECRET-KEY-EINFUEGEN` (Supabase › Project Settings › API Keys › Secret key, Kopier-Symbol).
-4. **Deploy**.
-5. Project › Settings › **Domains** › `raumvia.ch` hinzufügen. Die angezeigten Einträge (meist `A` → `76.76.21.21` und `CNAME www` → `cname.vercel-dns.com`) beim Domain-Anbieter eintragen.
-
-→ Danach teste ich die Live-Seite vollständig (Registrierung, Buchung, E-Mails).
+## 6. Vercel ✅ erledigt (12.10.2026)
+Projekt `raumvia` (Team Pro, Testphase), Domain `raumvia.ch` (www leitet weiter), Umgebungsvariablen gesetzt. `DATABASE_URL` nutzt den Supabase **Session-Pooler (Port 5432)**.
+Offen: Vor Ablauf der Pro-Testphase Zahlungsmittel hinterlegen (ca. USD 20/Monat).
 
 ## 7. Ihre Angaben fürs Impressum
 → **Mir schicken:** Vor- und Nachname, Adresse, ggf. Telefon. Ich trage sie ein (Rechtsform: Einzelunternehmen, ohne UID).
@@ -65,7 +55,5 @@ Impressum, Datenschutz, AGB, Nutzungsbedingungen und Auftragsbearbeitung einer F
 
 | Nach Schritt | Bitte schicken |
 |---|---|
-| 5 | Resend API-Key |
-| 6 | Bestätigung «Vercel-Projekt angelegt» |
 | 7 | Name, Adresse, Telefon fürs Impressum |
 | 8 | Stripe Test-Secret-Key, später Live-Key |

@@ -8,7 +8,7 @@ Diese Anleitung führt Schritt für Schritt zur Live-Umgebung. Empfohlener Stack
 
 1. Projekt anlegen, Region **Zürich (eu-central-2)**, falls verfügbar, sonst Frankfurt.
 2. *Database › Extensions*: `citext`, `btree_gist`, `pgcrypto` aktivieren.
-3. Connection-String (Session-Pooler, Port 5432, `?sslmode=require`) als `DATABASE_URL` notieren. Für serverlose Last kann der Transaction-Pooler (Port 6543) verwendet werden – die App deaktiviert dann Prepared Statements automatisch.
+3. Connection-String (Session-Pooler, Port 5432, `?sslmode=require`) als `DATABASE_URL` notieren. Den Transaction-Pooler (Port 6543) **nicht** verwenden: Auf Vercel blieben damit Seiten mit parallelen Abfragen (alles nach dem Login) bis zum Timeout hängen (getestet am 12.10.2026).
 4. Migrationen lokal gegen Produktion ausführen:
    ```bash
    DATABASE_URL="postgres://…" npm run db:migrate
