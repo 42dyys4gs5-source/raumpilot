@@ -13,8 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ vars.BACKUP_ENABLED == 'true' }}
     steps:
-      - name: Install PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client-16 || sudo apt-get install -y postgresql-client
+      # pg_dump must be at least the server's major version (Supabase runs PostgreSQL 17).
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update && sudo apt-get install -y postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> $GITHUB_PATH
       - name: Dump and encrypt
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
