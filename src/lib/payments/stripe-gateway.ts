@@ -100,23 +100,24 @@ export const stripeGateway: PaymentGateway = {
   },
 
   async createConnectAccount(p) {
-    // Standard-like configuration: the landlord has full Stripe dashboard access, pays Stripe fees
-    // and Stripe handles requirement collection (KYC). Raumvia is not merchant of record.
-    const a = await stripe().accounts.create(
+    // Standard-like configuration: the landlord has full Stripe dashboard access, Stripe collects its
+    // fees from the landlord and carries losses; Stripe handles requirement collection (KYC).
+    // Raumvia is not merchant of record. New platforms must use Accounts v2 for creation; the
+    // resulting acct_ id works unchanged with the v1 APIs used elsewhere (links, checkout, refunds).
+    const a = await stripe().v2.core.accounts.create(
       {
-        country: p.country || "CH",
-        email: p.email,
-        business_profile: { name: p.businessName },
-        controller: {
-          stripe_dashboard: { type: "full" },
-          fees: { payer: "account" },
-          losses: { payments: "stripe" },
-          requirement_collection: "stripe",
+        display_name: p.businessName,
+        contact_email: p.email,
+        identity: { country: (p.country || "CH").toLowerCase() },
+        dashboard: "full",
+        defaults: { responsibilities: { fees_collector: "stripe", losses_collector: "stripe" } },
+        configuration: {
+          merchant: { capabilities: { card_payments: { requested: true }, twint_payments: { requested: true } } },
+          recipient: { capabilities: { stripe_balance: { stripe_transfers: { requested: true } } } },
         },
-        capabilities: { card_payments: { requested: true }, transfers: { requested: true }, twint_payments: { requested: true } },
         metadata: { org_id: p.orgId },
       },
-      { idempotencyKey: `connect-account:${p.orgId}` },
+      { idempotencyKey: `connect-account-v2:${p.orgId}` },
     );
     return a.id;
   },
