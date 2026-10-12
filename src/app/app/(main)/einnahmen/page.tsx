@@ -7,6 +7,7 @@ import { FeatureLocked } from "@/components/dashboard/feature-gate";
 import { requireOrg } from "@/lib/auth/guards";
 import { db, schema } from "@/lib/db";
 import { paymentsEnabled } from "@/lib/env";
+import { gateway } from "@/lib/payments/gateway";
 import { orgStats } from "@/lib/stats";
 import { formatDateTime } from "@/lib/utils/dates";
 import { formatMoney } from "@/lib/utils/money";
@@ -15,7 +16,18 @@ import { connectStripeAction, refreshStripeAction } from "./actions";
 export default async function RevenuePage({ searchParams }: { searchParams: Promise<{ stripe?: string }> }) {
   const ctx = await requireOrg("admin");
   const { stripe } = await searchParams;
-  const org = ctx.org;
+  let org = ctx.org;
+  // Back from Stripe onboarding: fetch the account status right away instead of waiting for the webhook.
+  if (stripe === "zurueck" && paymentsEnabled && org.stripeAccountId) {
+    try {
+      const s = await gateway().retrieveAccount(org.stripeAccountId);
+      const status = { stripeChargesEnabled: s.chargesEnabled, stripePayoutsEnabled: s.payoutsEnabled, stripeDetailsSubmitted: s.detailsSubmitted };
+      await db.update(schema.organizations).set(status).where(eq(schema.organizations.id, org.id));
+      org = { ...org, ...status };
+    } catch {
+      // The webhook or the «Status aktualisieren» button will catch up.
+    }
+  }
   const features = ctx.plan?.features;
   const [payments, stats] = await Promise.all([
     db.select({ p: schema.payments, ref: schema.bookings.reference, customer: schema.bookings.customerName, bookingId: schema.bookings.id })

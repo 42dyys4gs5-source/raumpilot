@@ -101,7 +101,12 @@ async function resolveOrg(tx: DbOrTx, orgId: string | null, customerId: string) 
 export async function syncSubscription(s: SubscriptionData) {
   await db.transaction(async (tx) => {
     const org = await resolveOrg(tx, s.orgId, s.customerId);
-    if (!org) throw new Error(`Keine Organisation zu Stripe-Kunde ${s.customerId}`);
+    // Not a Raumvia customer (e.g. created manually in the Stripe dashboard): nothing to sync, and
+    // throwing would only make Stripe retry the event for days. Same behaviour as recordInvoice.
+    if (!org) {
+      console.warn(`[billing] Abo ${s.id}: keine Organisation zu Stripe-Kunde ${s.customerId} – ignoriert`);
+      return;
+    }
     const plans = await listPlans(tx);
     const plan = plans.find((p) => p.stripePriceId && p.stripePriceId === s.priceId) ?? plans.find((p) => p.key === s.planKeyHint);
     if (!plan) throw new Error(`Unbekannter Preis ${s.priceId}`);
