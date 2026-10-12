@@ -1,4 +1,5 @@
-import { CalendarCheck2, CreditCard, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CalendarCheck2, CreditCard, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -17,9 +18,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
         <p className="relative text-sm text-brand-200">Buchungssoftware für Event-, Seminar-, Probe- und Partyräume, Studios und Sitzungszimmer.</p>
       </aside>
-      <main className="flex flex-col px-4 py-8 sm:px-10">
-        <div className="lg:hidden"><Logo /></div>
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">{children}</div>
+      <main className="flex flex-col px-4 py-6 sm:px-10 sm:py-8">
+        <div className="flex items-center justify-between gap-4">
+          <div className="lg:invisible"><Logo /></div>
+          <Link href="/" className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-ink-600 transition-colors hover:bg-ink-100/70 hover:text-ink-900"><ArrowLeft className="size-4" /> Zur Website</Link>
+        </div>
+        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10 animate-fade-up">{children}</div>
       </main>
     </div>
   );
