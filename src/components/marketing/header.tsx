@@ -31,13 +31,21 @@ export function MarketingHeader({ loggedIn }: { loggedIn: boolean }) {
   const pathname = usePathname();
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+  useEffect(() => {
     const on = () => setScrolled(window.scrollY > 8);
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
   return (
-    <header className={cn("sticky top-0 z-40 transition-all", scrolled ? "border-b border-ink-200/70 bg-white/85 backdrop-blur-md" : "bg-transparent")}>
+    <header className={cn("sticky top-0 z-40 transition-all", open ? "bg-white" : scrolled ? "border-b border-ink-200/70 bg-white/85 backdrop-blur-md" : "bg-transparent")}>
       <div className="container-page flex h-16 items-center gap-8">
         <Logo />
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Hauptnavigation">
@@ -60,17 +68,17 @@ export function MarketingHeader({ loggedIn }: { loggedIn: boolean }) {
             </>
           )}
         </div>
-        <button className="ml-auto rounded-lg p-2 lg:hidden" aria-label={open ? "Menü schliessen" : "Menü öffnen"} aria-expanded={open} onClick={() => setOpen(!open)}>
+        <button type="button" className="-mr-2 ml-auto rounded-lg p-2 lg:hidden" aria-label={open ? "Menü schliessen" : "Menü öffnen"} aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <X className="size-6" /> : <Menu className="size-6" />}
         </button>
       </div>
       {open && (
-        <div className="border-t border-ink-200 bg-white lg:hidden">
-          <nav className="container-page space-y-1 py-4" aria-label="Mobile Navigation">
+        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-ink-200 bg-white lg:hidden">
+          <nav className="container-page space-y-1 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]" aria-label="Mobile Navigation">
             <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Lösungen</p>
-            {SOLUTIONS.map(([slug, label]) => <Link key={slug} href={`/loesungen/${slug}`} className="block rounded-lg px-3 py-2 text-ink-700 hover:bg-ink-50">{label}</Link>)}
+            {SOLUTIONS.map(([slug, label]) => <Link key={slug} href={`/loesungen/${slug}`} className="block rounded-lg px-3 py-2.5 text-ink-700 hover:bg-ink-50">{label}</Link>)}
             <div className="my-2 border-t border-ink-100" />
-            {LINKS.map((l) => <Link key={l.href} href={l.href} className="block rounded-lg px-3 py-2 font-medium text-ink-800 hover:bg-ink-50">{l.label}</Link>)}
+            {LINKS.map((l) => <Link key={l.href} href={l.href} className="block rounded-lg px-3 py-2.5 font-medium text-ink-800 hover:bg-ink-50">{l.label}</Link>)}
             <div className="grid grid-cols-2 gap-2 pt-3">
               {loggedIn ? <ButtonLink href="/app" className="col-span-2">Zum Dashboard</ButtonLink> : (
                 <>
