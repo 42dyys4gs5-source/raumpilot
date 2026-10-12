@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookingWidget } from "@/components/booking/booking-widget";
@@ -46,7 +47,7 @@ export default async function RoomPage({ params }: Params) {
   };
   return (
     <div className="min-h-dvh bg-white">
-      <header className="border-b border-ink-100">
+      <header className="sticky top-0 z-30 border-b border-ink-100 bg-white/85 backdrop-blur-md">
         <div className="container-page flex h-16 items-center justify-between">
           <Link href={`/v/${d.org.slug}`} className="flex items-center gap-3 font-display font-semibold text-ink-900">
             {d.branding && d.org.logoPath ? <img src={publicUrl(d.org.logoPath)!} alt={d.org.name} className="h-9 w-auto" /> : null}
@@ -56,16 +57,16 @@ export default async function RoomPage({ params }: Params) {
         </div>
       </header>
       <main className="container-page py-6 sm:py-10">
-        <nav className="mb-4 text-sm text-ink-500" aria-label="Brotkrumen">
-          <Link href={`/v/${d.org.slug}`} className="hover:underline">{d.org.name}</Link> / <span className="text-ink-800">{d.room.name}</span>
+        <nav className="mb-4 flex flex-wrap items-center gap-1 text-sm text-ink-500" aria-label="Brotkrumen">
+          <Link href={`/v/${d.org.slug}`} className="hover:text-ink-800 hover:underline">{d.org.name}</Link> <ChevronRight className="size-3.5 text-ink-300" aria-hidden="true" /> <span className="text-ink-800">{d.room.name}</span>
         </nav>
-        <h1 className="text-3xl font-semibold sm:text-4xl">{d.room.name}</h1>
-        <p className="mt-1 text-ink-500">{CATEGORY_LABELS[d.room.category]}{d.room.city ? ` in ${d.room.city}` : ""}</p>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{d.room.name}</h1>
+        <p className="mt-1.5 text-ink-500">{CATEGORY_LABELS[d.room.category]}{d.room.city ? ` in ${d.room.city}` : ""}</p>
         <div className="mt-6"><Gallery d={d} /></div>
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_420px]">
-          <div className="order-2 lg:order-1"><RoomDetails d={d} /></div>
-          <aside className="order-1 lg:order-2" id="buchen">
-            <div className="rounded-2xl border border-ink-200 p-5 shadow-soft lg:sticky lg:top-6">
+        <div className="mt-8 grid gap-10 sm:mt-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-12">
+          <div className="order-2 min-w-0 lg:order-1"><RoomDetails d={d} /></div>
+          <aside className="order-1 min-w-0 scroll-mt-20 lg:order-2" id="buchen">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-lift sm:p-6 lg:sticky lg:top-24">
               <h2 className="text-lg font-semibold">{d.room.bookingMode === "request" ? "Anfrage stellen" : "Jetzt buchen"}</h2>
               <div className="mb-5 mt-1"><PriceSummary d={d} /></div>
               {d.bookable ? (

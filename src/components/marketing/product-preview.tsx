@@ -28,8 +28,8 @@ export function ProductPreview() {
         </div>
         <div className="mt-4 flex h-10 items-center justify-center rounded-lg bg-brand-700 text-sm font-semibold text-white">Weiter zur Zahlung</div>
       </div>
-      <div className="absolute -left-8 top-24 hidden rotate-[-4deg] rounded-xl border border-ink-200 bg-white px-3 py-2 text-xs shadow-lift sm:flex sm:items-center sm:gap-2"><CreditCard className="size-4 text-brand-700" /> TWINT oder Karte</div>
-      <div className="absolute -right-6 bottom-20 hidden rotate-[3deg] rounded-xl border border-ink-200 bg-white px-3 py-2 text-xs shadow-lift sm:flex sm:items-center sm:gap-2"><CalendarCheck2 className="size-4 text-brand-700" /> Bestätigung versendet <Check className="size-3.5 text-emerald-600" /></div>
+      <div className="absolute -left-10 -top-7 hidden rotate-[-4deg] rounded-xl border border-ink-200 bg-white px-3 py-2 text-xs shadow-lift sm:flex sm:items-center sm:gap-2"><CreditCard className="size-4 text-brand-700" /> TWINT oder Karte</div>
+      <div className="absolute -bottom-5 -right-6 hidden rotate-[3deg] rounded-xl border border-ink-200 bg-white px-3 py-2 text-xs shadow-lift sm:flex sm:items-center sm:gap-2"><CalendarCheck2 className="size-4 text-brand-700" /> Bestätigung versendet <Check className="size-3.5 text-emerald-600" /></div>
     </div>
   );
 }
