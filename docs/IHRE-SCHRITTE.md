@@ -10,9 +10,8 @@ Alles, was ohne Ihre Konten möglich war, ist erledigt: Code, Tests, Datenbank- 
 ## 2. Postfach info@raumvia.ch ✅ erledigt
 MX- und SPF-Einträge von Hostpoint sind aktiv. Raumvia verschickt E-Mails selbst über Resend; im Postfach lesen Sie Antworten von Kunden und Supportanfragen.
 
-## 3. AHV-Anmeldung als Selbständige/r (15 Min.)
-Bei der **Ausgleichskasse Ihres Wohnkantons** anmelden (online; Liste: ahv-iv.ch › Kontakte › Kantonale Ausgleichskassen). Für ein Einzelunternehmen unter CHF 100’000 Umsatz ist **kein Handelsregistereintrag und keine MWST** nötig.
-Auftritt: Ihr Familienname muss im Firmennamen stehen, z. B. **«Max Muster, Raumvia»**.
+## 3. AHV-Anmeldung ✅ erledigt
+Als Selbständiger bei der Ausgleichskasse angemeldet.
 
 ## 4. Supabase ✅ erledigt (11.10.2026)
 Projekt `iuevxsswjnamlwwelfsv` (Region Zürich): 33 Tabellen, Tarife, Doppelbuchungsschutz, Bucket `media`. Der öffentliche Datenzugriff über die Supabase-API ist gesperrt (RLS aktiv, keine Rechte für `anon`/`authenticated`). Raumvia greift nur serverseitig zu.
@@ -25,15 +24,11 @@ Domain `raumvia.ch` mit DKIM/SPF-Einträgen bei Hostpoint eingetragen (Region EU
 Projekt `raumvia` (Team Pro, Testphase), Domain `raumvia.ch` (www leitet weiter), Umgebungsvariablen gesetzt. `DATABASE_URL` nutzt den Supabase **Session-Pooler (Port 5432)**.
 Offen: Vor Ablauf der Pro-Testphase Zahlungsmittel hinterlegen (ca. USD 20/Monat).
 
-## 7. Ihre Angaben fürs Impressum
-→ **Mir schicken:** Vor- und Nachname, Adresse, ggf. Telefon. Ich trage sie ein (Rechtsform: Einzelunternehmen, ohne UID).
+## 7. Impressum ✅ erledigt
+Betreiber: Sven Schwenter (Einzelunternehmen), Münchenstein. Bei Änderungen: Admin › Einstellungen.
 
-## 8. Stripe (30 Min. + Prüfung durch Stripe)
-1. stripe.com › Konto eröffnen · Land **Schweiz** · Unternehmensart **Einzelunternehmen** · Identität + Bankkonto (IBAN) angeben.
-2. Dashboard › **Connect** › Get started (Plattform, «Software für Vermieter, Zahlungen gehen an die Vermieter»).
-3. Entwickler › API-Schlüssel › **Testmodus**-Secret-Key (`sk_test_…`) kopieren.
-
-→ **Mir schicken:** den Test-Schlüssel. Ich richte mit `scripts/stripe-setup.ts` automatisch Produkte, Preise, Kundenportal und Webhooks ein und teste Abo- und Buchungszahlungen. Danach dasselbe mit dem Live-Schlüssel.
+## 8. Stripe ✅ erledigt (12.10.2026)
+Konto verifiziert (Zahlungen und Auszahlungen aktiv). Live-Produkte, -Preise, Kundenportal und Webhooks angelegt; Abo, Connect-Onboarding und Buchung mit Onlinezahlung im Testmodus Ende-zu-Ende getestet. Offen: Connect-Plattformprofil im Live-Modus prüfen.
 
 ## 9. Marke anmelden (20 Min., CHF 550 für 10 Jahre, bis 3 Klassen)
 Online beim IGE (**ige.ch** › Marken › Marke anmelden) › Wortmarke `RAUMVIA` · Inhaber: Sie persönlich. Leistungsverzeichnis zum Einfügen:
@@ -55,5 +50,3 @@ Impressum, Datenschutz, AGB, Nutzungsbedingungen und Auftragsbearbeitung einer F
 
 | Nach Schritt | Bitte schicken |
 |---|---|
-| 7 | Name, Adresse, Telefon fürs Impressum |
-| 8 | Stripe Test-Secret-Key, später Live-Key |
