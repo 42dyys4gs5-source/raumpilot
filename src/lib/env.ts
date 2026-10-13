@@ -16,9 +16,9 @@ const schema = z.object({
   CRON_SECRET: z.string().min(16).default("dev-only-cron-secret"),
 
   PAYMENTS_MODE: z.enum(["stripe", "disabled", "fake"]).default("disabled"),
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
-  STRIPE_CONNECT_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_SECRET_KEY: z.string().trim().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().trim().optional(),
+  STRIPE_CONNECT_WEBHOOK_SECRET: z.string().trim().optional(),
   /** Platform fee on tenant bookings in basis points (0 = none). */
   PLATFORM_FEE_BPS: z.coerce.number().int().min(0).max(2000).default(0),
   TRIAL_DAYS: z.coerce.number().int().min(0).max(60).default(14),
