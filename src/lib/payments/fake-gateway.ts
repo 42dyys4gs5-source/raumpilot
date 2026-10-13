@@ -11,6 +11,9 @@ function guard() {
   if (env.NODE_ENV === "production" && !process.env.E2E_TEST_MODE) throw new Error("Fake-Zahlungen sind in Produktion nicht erlaubt.");
 }
 
+/** Credits granted via the fake gateway (inspected by tests). */
+export const fakeCredits: { customerId: string; amount: number; idempotencyKey: string }[] = [];
+
 export const fakeGateway: PaymentGateway = {
   async createBookingCheckout(p) {
     guard();
@@ -30,7 +33,7 @@ export const fakeGateway: PaymentGateway = {
   async createSubscriptionCheckout(p) {
     guard();
     const id = `cs_fake_sub_${randomToken(12)}`;
-    const q = new URLSearchParams({ kind: "subscription", session: id, org: p.orgId, plan: p.planKey, customer: p.customerId ?? "", success: p.successUrl, cancel: p.cancelUrl });
+    const q = new URLSearchParams({ kind: "subscription", session: id, org: p.orgId, plan: p.planKey, interval: /_year$/.test(p.priceId) ? "year" : "month", customer: p.customerId ?? "", success: p.successUrl, cancel: p.cancelUrl });
     return { id, url: appUrl(`/dev/checkout?${q}`) };
   },
   async createBillingPortal(p) {
@@ -51,5 +54,9 @@ export const fakeGateway: PaymentGateway = {
   async cancelSubscriptionNow() {},
   async retrieveAccount() {
     return { chargesEnabled: true, payoutsEnabled: true, detailsSubmitted: true };
+  },
+  async creditCustomer(p) {
+    guard();
+    if (!fakeCredits.some((c) => c.idempotencyKey === p.idempotencyKey)) fakeCredits.push({ customerId: p.customerId, amount: p.amount, idempotencyKey: p.idempotencyKey });
   },
 };

@@ -1,6 +1,6 @@
 /**
  * Richtet Stripe für Raumvia vollautomatisch ein (mehrfach ausführbar):
- *  - Produkte + monatliche CHF-Preise für Starter / Professional / Business
+ *  - Produkte + monatliche und jährliche CHF-Preise (12 Monate zum Preis von 10) für Starter / Professional / Business
  *  - Kundenportal (Kündigung zum Laufzeitende, Tarifwechsel, Zahlungsmittel, Rechnungen)
  *  - Webhook-Endpunkte für Plattform und Connect (gibt die Signing Secrets aus)
  *  - trägt die Preis-IDs in die Datenbank ein (falls DATABASE_URL gesetzt)
@@ -21,34 +21,45 @@ const stripe = new Stripe(key);
 
 console.log(`\nStripe-Einrichtung (${live ? "LIVE" : "Testmodus"}) für ${appUrl}\n`);
 
-// 1) Produkte und Preise
+// 1) Produkte und Preise (monatlich und jährlich: 12 Monate zum Preis von 10)
+const YEARLY_MONTHS_CHARGED = 10;
 const priceIds: Record<string, string> = {};
+const yearlyPriceIds: Record<string, string> = {};
 for (const plan of DEFAULT_PLANS) {
-  const lookup = `raumvia_${plan.key}_monthly_${plan.priceMonthly}`;
-  const existing = await stripe.prices.list({ lookup_keys: [lookup], active: true, limit: 1 });
-  if (existing.data[0]) {
-    priceIds[plan.key] = existing.data[0].id;
-    console.log(`✓ Preis vorhanden: ${plan.name} → ${existing.data[0].id}`);
-    continue;
-  }
   const products = await stripe.products.search({ query: `metadata['raumvia_plan']:'${plan.key}'` });
-  const product =
-    products.data[0] ??
-    (await stripe.products.create({ name: `Raumvia ${plan.name}`, description: plan.description, metadata: { raumvia_plan: plan.key } }));
-  const price = await stripe.prices.create({
-    product: product.id,
-    currency: "chf",
-    unit_amount: plan.priceMonthly,
-    recurring: { interval: "month" },
-    lookup_key: lookup,
-    metadata: { raumvia_plan: plan.key },
-  });
-  priceIds[plan.key] = price.id;
-  console.log(`✓ Preis angelegt: ${plan.name} CHF ${(plan.priceMonthly / 100).toFixed(2)}/Monat → ${price.id}`);
+  let product = products.data[0];
+  for (const [interval, amount, target] of [
+    ["month", plan.priceMonthly, priceIds],
+    ["year", plan.priceMonthly * YEARLY_MONTHS_CHARGED, yearlyPriceIds],
+  ] as const) {
+    const lookup = `raumvia_${plan.key}_${interval === "month" ? "monthly" : "yearly"}_${amount}`;
+    const existing = await stripe.prices.list({ lookup_keys: [lookup], active: true, limit: 1 });
+    if (existing.data[0]) {
+      target[plan.key] = existing.data[0].id;
+      console.log(`✓ Preis vorhanden: ${plan.name} (${interval === "month" ? "monatlich" : "jährlich"}) → ${existing.data[0].id}`);
+      continue;
+    }
+    product ??= await stripe.products.create({ name: `Raumvia ${plan.name}`, description: plan.description, metadata: { raumvia_plan: plan.key } });
+    const price = await stripe.prices.create({
+      product: product.id,
+      currency: "chf",
+      unit_amount: amount,
+      recurring: { interval },
+      lookup_key: lookup,
+      metadata: { raumvia_plan: plan.key, interval },
+    });
+    target[plan.key] = price.id;
+    console.log(`✓ Preis angelegt: ${plan.name} CHF ${(amount / 100).toFixed(2)}/${interval === "month" ? "Monat" : "Jahr"} → ${price.id}`);
+  }
 }
 
 // 2) Kundenportal (Standardkonfiguration aktualisieren oder anlegen)
-const prices = await Promise.all(Object.values(priceIds).map((id) => stripe.prices.retrieve(id)));
+const prices = await Promise.all([...Object.values(priceIds), ...Object.values(yearlyPriceIds)].map((id) => stripe.prices.retrieve(id)));
+const byProduct = new Map<string, string[]>();
+for (const p of prices) {
+  const pid = typeof p.product === "string" ? p.product : p.product.id;
+  byProduct.set(pid, [...(byProduct.get(pid) ?? []), p.id]);
+}
 const portalFeatures = {
   customer_update: { enabled: true, allowed_updates: ["email", "address", "name", "tax_id"] as ("email" | "address" | "name" | "tax_id")[] },
   invoice_history: { enabled: true },
@@ -58,7 +69,7 @@ const portalFeatures = {
     enabled: true,
     default_allowed_updates: ["price"] as "price"[],
     proration_behavior: "create_prorations" as const,
-    products: prices.map((p) => ({ product: typeof p.product === "string" ? p.product : p.product.id, prices: [p.id] })),
+    products: [...byProduct].map(([product, ids]) => ({ product, prices: ids })),
   },
 };
 const configs = await stripe.billingPortal.configurations.list({ is_default: true, limit: 1 });
@@ -119,7 +130,7 @@ for (const [name, path, events, connect] of [
 // 4) Preis-IDs in die Datenbank schreiben
 if (process.env.DATABASE_URL) {
   const sql = postgres(process.env.DATABASE_URL, { max: 1, onnotice: () => {} });
-  for (const [k, id] of Object.entries(priceIds)) await sql`UPDATE plans SET stripe_price_id = ${id}, updated_at = now() WHERE key = ${k}`;
+  for (const [k, id] of Object.entries(priceIds)) await sql`UPDATE plans SET stripe_price_id = ${id}, stripe_price_id_yearly = ${yearlyPriceIds[k] ?? null}, updated_at = now() WHERE key = ${k}`;
   await sql.end();
   console.log("✓ Preis-IDs in der Datenbank hinterlegt");
 }
@@ -128,5 +139,6 @@ console.log("\n──────── In Vercel eintragen ──────�
 console.log(`PAYMENTS_MODE=stripe`);
 console.log(`STRIPE_SECRET_KEY=${key.slice(0, 12)}…  (Ihr Schlüssel)`);
 for (const [k, v] of Object.entries(secrets)) console.log(`${k}=${v}`);
-console.log("Preis-IDs:", priceIds);
+console.log("Preis-IDs monatlich:", priceIds);
+console.log("Preis-IDs jährlich:", yearlyPriceIds);
 console.log("\nNoch manuell im Stripe-Dashboard: Connect aktivieren/Plattformprofil ausfüllen, Smart Retries und Kunden-E-Mails (Belege, Rechnungen) einschalten.\n");

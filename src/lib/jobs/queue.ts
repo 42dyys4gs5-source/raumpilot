@@ -9,7 +9,8 @@ export type JobType =
   | "booking.reminders"
   | "booking.expire"
   | "system.daily"
-  | "report.monthly";
+  | "report.monthly"
+  | "referral.reward";
 
 export type EnqueueOptions = { runAt?: Date; dedupeKey?: string; maxAttempts?: number };
 

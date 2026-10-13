@@ -145,4 +145,12 @@ export const stripeGateway: PaymentGateway = {
     const a = await stripe().accounts.retrieve(accountId);
     return { chargesEnabled: !!a.charges_enabled, payoutsEnabled: !!a.payouts_enabled, detailsSubmitted: !!a.details_submitted };
   },
+
+  async creditCustomer(p) {
+    await stripe().customers.createBalanceTransaction(
+      p.customerId,
+      { amount: -Math.abs(p.amount), currency: p.currency.toLowerCase(), description: p.description },
+      { idempotencyKey: p.idempotencyKey },
+    );
+  },
 };

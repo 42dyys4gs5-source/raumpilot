@@ -6,7 +6,7 @@ import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 import { processStripeEvent } from "@/lib/payments/webhooks";
 import { randomToken } from "@/lib/security/crypto";
-import { listPlans } from "@/lib/billing/entitlements";
+import { listPlans, parseInterval, yearlyPrice, type BillingInterval } from "@/lib/billing/entitlements";
 import { formatMoney } from "@/lib/utils/money";
 
 /**
@@ -24,10 +24,14 @@ function guard() {
 const evt = (type: string, object: unknown, account?: string) =>
   ({ id: `evt_fake_${randomToken(10)}`, type, account, data: { object }, object: "event", created: Math.floor(Date.now() / 1000) }) as unknown as Stripe.Event;
 
-async function fakeSubscription(orgId: string, planKey: string, status: string, extra: Record<string, unknown> = {}) {
+async function fakeSubscription(orgId: string, planKey: string, status: string, extra: Record<string, unknown> = {}, interval: BillingInterval = "month") {
   const [org] = await db.select().from(schema.organizations).where(eq(schema.organizations.id, orgId));
   const plan = (await listPlans()).find((p) => p.key === planKey)!;
-  const periodEnd = Math.floor(Date.now() / 1000) + 30 * 86400;
+  const periodEnd = Math.floor(Date.now() / 1000) + (interval === "year" ? 365 : 30) * 86400;
+  const price =
+    interval === "year"
+      ? { id: plan.stripePriceIdYearly ?? `price_fake_${planKey}_year`, unit_amount: yearlyPrice(plan), recurring: { interval: "year" } }
+      : { id: plan.stripePriceId ?? `price_fake_${planKey}`, unit_amount: plan.priceMonthly, recurring: { interval: "month" } };
   return {
     id: `sub_fake_${orgId.replace(/-/g, "").slice(0, 12)}`,
     object: "subscription",
@@ -38,7 +42,7 @@ async function fakeSubscription(orgId: string, planKey: string, status: string, 
     cancel_at: null,
     canceled_at: null,
     trial_end: status === "trialing" ? periodEnd : null,
-    items: { data: [{ current_period_end: periodEnd, price: { id: plan.stripePriceId ?? `price_fake_${planKey}`, unit_amount: plan.priceMonthly } }] },
+    items: { data: [{ current_period_end: periodEnd, price }] },
     ...extra,
   };
 }
@@ -66,22 +70,24 @@ async function act(fd: FormData) {
     const [o] = await db.select().from(schema.organizations).where(eq(schema.organizations.id, org));
     await processStripeEvent(evt("checkout.session.completed", { id: session, object: "checkout.session", mode: "subscription", client_reference_id: org, customer: o.stripeCustomerId ?? `cus_fake_${org.slice(0, 8)}`, metadata: { org_id: org } }), "platform");
     const had = await db.select().from(schema.subscriptions).where(eq(schema.subscriptions.orgId, org));
-    await processStripeEvent(evt("customer.subscription.created", await fakeSubscription(org, plan, had.length || env.TRIAL_DAYS === 0 ? "active" : "trialing")), "platform");
+    await processStripeEvent(evt("customer.subscription.created", await fakeSubscription(org, plan, had.length || env.TRIAL_DAYS === 0 ? "active" : "trialing", {}, parseInterval(fd.get("interval")))), "platform");
   } else if (op === "portal-cancel" || op === "portal-resume" || op === "portal-change" || op === "portal-fail" || op === "portal-renew" || op === "portal-end") {
     const [o] = await db.select().from(schema.organizations).where(eq(schema.organizations.stripeCustomerId, String(fd.get("customer"))));
     if (!o) notFound();
     const [s] = await db.select().from(schema.subscriptions).where(and(eq(schema.subscriptions.orgId, o.id), eq(schema.subscriptions.source, "stripe")));
     const current = s?.planKey ?? o.planKey ?? "starter";
-    if (op === "portal-cancel") await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, current, "active", { cancel_at_period_end: true })), "platform");
-    if (op === "portal-resume") await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, current, "active")), "platform");
-    if (op === "portal-change") await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, plan, "active")), "platform");
-    if (op === "portal-end") await processStripeEvent(evt("customer.subscription.deleted", await fakeSubscription(o.id, current, "canceled", { canceled_at: Math.floor(Date.now() / 1000) })), "platform");
+    const iv = parseInterval(s?.billingInterval);
+    if (op === "portal-cancel") await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, current, "active", { cancel_at_period_end: true }, iv)), "platform");
+    if (op === "portal-resume") await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, current, "active", {}, iv)), "platform");
+    if (op === "portal-change") await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, plan, "active", {}, iv)), "platform");
+    if (op === "portal-end") await processStripeEvent(evt("customer.subscription.deleted", await fakeSubscription(o.id, current, "canceled", { canceled_at: Math.floor(Date.now() / 1000) }, iv)), "platform");
     if (op === "portal-fail" || op === "portal-renew") {
       const failed = op === "portal-fail";
       const p = (await listPlans()).find((x) => x.key === current)!;
-      const inv = { id: `in_fake_${randomToken(8)}`, object: "invoice", customer: o.stripeCustomerId, number: `TEST-${Date.now()}`, status: failed ? "open" : "paid", amount_due: p.priceMonthly, amount_paid: failed ? 0 : p.priceMonthly, currency: "chf", hosted_invoice_url: null, invoice_pdf: null, period_start: Math.floor(Date.now() / 1000), period_end: Math.floor(Date.now() / 1000) + 30 * 86400, billing_reason: "subscription_cycle", parent: { subscription_details: { subscription: s?.stripeSubscriptionId } } };
+      const amt = iv === "year" ? yearlyPrice(p) : p.priceMonthly;
+      const inv = { id: `in_fake_${randomToken(8)}`, object: "invoice", customer: o.stripeCustomerId, number: `TEST-${Date.now()}`, status: failed ? "open" : "paid", amount_due: amt, amount_paid: failed ? 0 : amt, currency: "chf", hosted_invoice_url: null, invoice_pdf: null, period_start: Math.floor(Date.now() / 1000), period_end: Math.floor(Date.now() / 1000) + 30 * 86400, billing_reason: "subscription_cycle", parent: { subscription_details: { subscription: s?.stripeSubscriptionId } } };
       await processStripeEvent(evt(failed ? "invoice.payment_failed" : "invoice.paid", inv), "platform");
-      await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, current, failed ? "past_due" : "active")), "platform");
+      await processStripeEvent(evt("customer.subscription.updated", await fakeSubscription(o.id, current, failed ? "past_due" : "active", {}, iv)), "platform");
     }
   } else if (op === "connect") {
     await processStripeEvent(evt("account.updated", { id: account, object: "account", charges_enabled: true, payouts_enabled: true, details_submitted: true }), "connect");
@@ -110,8 +116,8 @@ export default async function FakeCheckout({ searchParams }: { searchParams: Pro
       )}
       {sp.kind === "subscription" && (
         <div className="mt-6 space-y-4">
-          <h1 className="text-2xl font-semibold">Test-Abo: {sp.plan}</h1>
-          <FormBack back={sp.success} op="subscribe" label="Abo abschliessen" primary hiddenFields={{ org: sp.org, plan: sp.plan, session: sp.session }} />
+          <h1 className="text-2xl font-semibold">Test-Abo: {sp.plan}{sp.interval === "year" ? " (jährlich)" : ""}</h1>
+          <FormBack back={sp.success} op="subscribe" label="Abo abschliessen" primary hiddenFields={{ org: sp.org, plan: sp.plan, interval: sp.interval, session: sp.session }} />
           <a href={sp.cancel} className="text-sm underline">Abbrechen</a>
         </div>
       )}

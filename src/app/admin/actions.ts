@@ -69,6 +69,8 @@ export async function planAdminAction(_: ActionState, fd: FormData): Promise<Act
   if (price == null) return fail("Ungültiger Preis.");
   const priceId = str(fd, "stripePriceId");
   if (priceId && !/^price_[A-Za-z0-9]+$/.test(priceId)) return fail("Die Stripe-Preis-ID beginnt mit «price_».");
+  const priceIdYearly = str(fd, "stripePriceIdYearly");
+  if (priceIdYearly && !/^price_[A-Za-z0-9]+$/.test(priceIdYearly)) return fail("Die Stripe-Preis-ID (jährlich) beginnt mit «price_».");
   const [plan] = await db.select().from(schema.plans).where(eq(schema.plans.key, key));
   if (!plan) return fail("Tarif nicht gefunden.");
   const features = { ...plan.features };
@@ -80,6 +82,7 @@ export async function planAdminAction(_: ActionState, fd: FormData): Promise<Act
       description: str(fd, "description") || plan.description,
       priceMonthly: price,
       stripePriceId: priceId || null,
+      stripePriceIdYearly: priceIdYearly || null,
       maxRooms: Math.max(1, Number(str(fd, "maxRooms")) || plan.maxRooms),
       maxLocations: Math.max(1, Number(str(fd, "maxLocations")) || plan.maxLocations),
       maxMembers: Math.max(1, Number(str(fd, "maxMembers")) || plan.maxMembers),

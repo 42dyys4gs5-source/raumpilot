@@ -4,7 +4,8 @@ import { appUrl, env } from "@/lib/env";
 import * as T from "@/lib/email/templates";
 import { enqueueEmail } from "@/lib/jobs/queue";
 import { gateway } from "@/lib/payments/gateway";
-import { listPlans } from "./entitlements";
+import { type BillingInterval, listPlans, yearlyPrice } from "./entitlements";
+import { queueReferralReward } from "./referrals";
 
 type Org = typeof schema.organizations.$inferSelect;
 
@@ -17,6 +18,8 @@ export type SubscriptionData = {
   priceId: string | null;
   planKeyHint: string | null;
   unitAmount: number | null;
+  /** Billing interval of the price (month/year). */
+  interval: BillingInterval;
   cancelAtPeriodEnd: boolean;
   currentPeriodEnd: Date | null;
   trialEnd: Date | null;
@@ -51,11 +54,12 @@ export async function ensureStripeCustomer(org: Org): Promise<string> {
   return id;
 }
 
-export async function startSubscriptionCheckout(org: Org, planKey: string): Promise<string> {
+export async function startSubscriptionCheckout(org: Org, planKey: string, interval: BillingInterval = "month"): Promise<string> {
   const plan = (await listPlans()).find((p) => p.key === planKey && p.active);
   if (!plan) throw new Error("Unbekannter Tarif.");
-  if (!plan.stripePriceId && env.PAYMENTS_MODE === "stripe") {
-    throw new Error("Für diesen Tarif ist noch kein Stripe-Preis hinterlegt (Admin › Tarife).");
+  const priceId = interval === "year" ? plan.stripePriceIdYearly : plan.stripePriceId;
+  if (!priceId && env.PAYMENTS_MODE === "stripe") {
+    throw new Error(interval === "year" ? "Für diesen Tarif ist noch kein Jahrespreis hinterlegt (Admin › Tarife)." : "Für diesen Tarif ist noch kein Stripe-Preis hinterlegt (Admin › Tarife).");
   }
   const customerId = await ensureStripeCustomer(org);
   // Trial only for organisations that never had a subscription.
@@ -64,7 +68,7 @@ export async function startSubscriptionCheckout(org: Org, planKey: string): Prom
     orgId: org.id,
     customerId,
     email: org.contactEmail,
-    priceId: plan.stripePriceId ?? `price_fake_${plan.key}`,
+    priceId: priceId ?? (interval === "year" ? `price_fake_${plan.key}_year` : `price_fake_${plan.key}`),
     planKey: plan.key,
     trialDays: had.length ? 0 : env.TRIAL_DAYS,
     successUrl: appUrl("/app/abonnement?status=erfolgreich"),
@@ -108,7 +112,9 @@ export async function syncSubscription(s: SubscriptionData) {
       return;
     }
     const plans = await listPlans(tx);
-    const plan = plans.find((p) => p.stripePriceId && p.stripePriceId === s.priceId) ?? plans.find((p) => p.key === s.planKeyHint);
+    const plan =
+      plans.find((p) => !!s.priceId && (p.stripePriceId === s.priceId || p.stripePriceIdYearly === s.priceId)) ??
+      plans.find((p) => p.key === s.planKeyHint);
     if (!plan) throw new Error(`Unbekannter Preis ${s.priceId}`);
 
     const [existing] = await tx.select().from(schema.subscriptions).where(eq(schema.subscriptions.stripeSubscriptionId, s.id));
@@ -118,7 +124,9 @@ export async function syncSubscription(s: SubscriptionData) {
       stripeSubscriptionId: s.id,
       planKey: plan.key,
       status: s.status,
-      amountMonthly: s.unitAmount ?? plan.priceMonthly,
+      // MRR is always stored per month, also for annual prices.
+      amountMonthly: s.interval === "year" ? Math.round((s.unitAmount ?? yearlyPrice(plan)) / 12) : (s.unitAmount ?? plan.priceMonthly),
+      billingInterval: s.interval,
       currentPeriodEnd: s.currentPeriodEnd,
       cancelAtPeriodEnd: s.cancelAtPeriodEnd,
       canceledAt: s.canceledAt,
@@ -190,6 +198,7 @@ export async function recordInvoice(i: InvoiceData, event: "paid" | "failed" | "
         target: schema.invoices.stripeInvoiceId,
         set: { status: i.status, amountPaid: i.amountPaid, amountDue: i.amountDue, number: i.number, hostedInvoiceUrl: i.hostedInvoiceUrl, invoicePdf: i.invoicePdf, updatedAt: new Date() },
       });
+    if (event === "paid") await queueReferralReward(tx, org, i.amountPaid);
     const owner = await ownerContact(tx, org.id);
     if (!owner) return;
     if (event === "paid" && i.amountPaid > 0 && i.billingReason === "subscription_cycle") {

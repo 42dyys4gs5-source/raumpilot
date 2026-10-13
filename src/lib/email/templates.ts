@@ -120,8 +120,25 @@ export function subscriptionStartedMail(name: string, planName: string, trialEnd
     title: `Abo ${planName} aktiviert`,
     blocks: [
       { p: `Hallo ${name}, vielen Dank! Ihr Tarif ${planName} ist jetzt aktiv. Ihre Buchungsseite kann veröffentlicht werden.` },
-      ...(trialEnd ? [{ note: `Ihre kostenlose Testphase läuft bis ${formatDateTime(trialEnd)}. Danach wird der Monatsbeitrag automatisch belastet. Sie können jederzeit zum Ende der Laufzeit kündigen.` }] : []),
+      ...(trialEnd ? [{ note: `Ihre kostenlose Testphase läuft bis ${formatDateTime(trialEnd)}. Danach wird der Abobeitrag automatisch belastet. Sie können jederzeit zum Ende der Laufzeit kündigen.` }] : []),
       { button: { label: "Zum Dashboard", url: appUrl("/app") } },
+    ],
+  });
+}
+
+export function referralRewardMail(name: string, amount: number, side: "referrer" | "referred", otherOrgName: string | null): EmailContent {
+  return renderEmail({
+    subject: `Empfehlungsbonus: 1 Monat ${BRAND.name} gratis`,
+    title: "Ihr Empfehlungsbonus ist da",
+    blocks: [
+      {
+        p:
+          side === "referrer"
+            ? `Hallo ${name}, vielen Dank für Ihre Empfehlung${otherOrgName ? ` – ${otherOrgName} nutzt ${BRAND.name} jetzt` : ""}. Wir haben Ihnen ${formatMoney(amount)} gutgeschrieben.`
+            : `Hallo ${name}, willkommen bei ${BRAND.name}! Da Sie über eine Empfehlung${otherOrgName ? ` von ${otherOrgName}` : ""} zu uns gekommen sind, haben wir Ihnen ${formatMoney(amount)} gutgeschrieben.`,
+      },
+      { note: "Das Guthaben wird automatisch mit Ihrer nächsten Abo-Rechnung verrechnet." },
+      { button: { label: "Weitere Vermieter empfehlen", url: appUrl("/app/abonnement#empfehlen") } },
     ],
   });
 }

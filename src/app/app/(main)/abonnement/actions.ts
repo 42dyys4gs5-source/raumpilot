@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { fail, type ActionState } from "@/lib/actions/types";
 import { requireOrg } from "@/lib/auth/guards";
+import { parseInterval } from "@/lib/billing/entitlements";
 import { openBillingPortal, startSubscriptionCheckout } from "@/lib/billing/subscription";
 import { paymentsEnabled } from "@/lib/env";
 import { audit } from "@/lib/security/audit";
@@ -17,12 +18,12 @@ export async function subscribeAction(_: ActionState, fd: FormData): Promise<Act
   }
   let url: string;
   try {
-    url = await startSubscriptionCheckout(ctx.org, String(fd.get("plan") ?? ""));
+    url = await startSubscriptionCheckout(ctx.org, String(fd.get("plan") ?? ""), parseInterval(fd.get("interval")));
   } catch (e) {
     await logError("billing.checkout", e, { orgId: ctx.org.id });
     return fail((e as Error).message || "Der Bezahlvorgang konnte nicht gestartet werden.");
   }
-  await audit("billing.checkout_started", { userId: ctx.user.id, orgId: ctx.org.id, data: { plan: String(fd.get("plan")) } });
+  await audit("billing.checkout_started", { userId: ctx.user.id, orgId: ctx.org.id, data: { plan: String(fd.get("plan")), interval: parseInterval(fd.get("interval")) } });
   redirect(url);
 }
 

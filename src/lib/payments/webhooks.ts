@@ -23,6 +23,7 @@ export function normaliseSubscription(sub: Stripe.Subscription): SubscriptionDat
     priceId: item?.price?.id ?? null,
     planKeyHint: (sub.metadata?.plan_key as string) || null,
     unitAmount: item?.price?.unit_amount ?? null,
+    interval: item?.price?.recurring?.interval === "year" ? "year" : "month",
     cancelAtPeriodEnd: !!sub.cancel_at_period_end || !!sub.cancel_at,
     currentPeriodEnd: ts(item?.current_period_end ?? null),
     trialEnd: ts(sub.trial_end),
