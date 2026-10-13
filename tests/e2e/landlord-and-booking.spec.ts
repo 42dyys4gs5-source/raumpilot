@@ -82,6 +82,7 @@ test("Onlinezahlung: Stripe verbinden, bezahlen, Beleg, Stornierung mit Rückers
   await expect(page.getByRole("button", { name: /Drucken/ })).toBeVisible();
   await page.goBack();
   await expect(page).not.toHaveURL(/\/beleg$/);
+  await expect(page).toHaveURL(/\/buchung\/[^/?]+(\?|$)/);
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Verbindlich stornieren" }).click();
   await expect(page.getByText(/Die Rückerstattung ist veranlasst/)).toBeVisible();

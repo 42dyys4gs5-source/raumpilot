@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/loesungen/partyraeume", "/raeume", "/hilfe", "/hilfe/onlinezahlung", "/rechtliches/datenschutz", "/rechtliches/impressum", "/registrieren", "/login"];
+const PAGES = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/loesungen/partyraeume", "/raeume", "/hilfe", "/hilfe/onlinezahlung", "/ratgeber", "/ratgeber/partyraum-vermieten", "/ratgeber/vereinslokal-vermieten", "/loesungen/gemeinschaftsraeume", "/rechtliches/datenschutz", "/rechtliches/impressum", "/registrieren", "/login"];
 
 for (const path of PAGES) {
   test(`Seite ${path} lädt mit Titel und ohne Fehler`, async ({ page }) => {

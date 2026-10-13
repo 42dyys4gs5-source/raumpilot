@@ -1,9 +1,11 @@
 import { ArrowRight, Check, X } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ButtonLink } from "@/components/ui/button";
 import { ContentBlocks } from "@/components/marketing/content-blocks";
 import { PageHero } from "@/components/marketing/page-hero";
+import { guidesForSolution } from "@/content/guides";
 import { getSolution, SOLUTIONS } from "@/content/solutions";
 import { appUrl } from "@/lib/env";
 
@@ -20,6 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function SolutionPage({ params }: { params: Promise<{ slug: string }> }) {
   const s = getSolution((await params).slug);
   if (!s) notFound();
+  const guides = guidesForSolution(s.slug);
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -54,6 +57,12 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             {s.faq.map((f) => <details key={f.q} className="p-5"><summary className="cursor-pointer font-medium">{f.q}</summary><p className="mt-2 text-sm text-ink-600">{f.a}</p></details>)}
           </div>
         </div>
+        {guides.length > 0 && (
+          <div className="container-page mt-10 max-w-3xl">
+            <h2 className="text-lg font-semibold">Ratgeber</h2>
+            <ul className="mt-3 space-y-2">{guides.map((g) => <li key={g.slug}><Link href={`/ratgeber/${g.slug}`} className="text-brand-700 hover:underline">{g.title}</Link></li>)}</ul>
+          </div>
+        )}
         <div className="mt-14 text-center"><ButtonLink href="/registrieren" size="lg">Ihren Raum jetzt online stellen <ArrowRight /></ButtonLink></div>
       </section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />

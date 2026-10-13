@@ -4,8 +4,8 @@ import { BRAND } from "@/config/brand";
 
 const COLS = [
   { title: "Produkt", links: [["/funktionen", "Funktionen"], ["/preise", "Preise"], ["/so-funktionierts", "So funktioniert's"], ["/raeume", "Raumverzeichnis"], ["/registrieren", "Kostenlos testen"]] },
-  { title: "Lösungen", links: [["/loesungen/eventraeume", "Eventräume"], ["/loesungen/partyraeume", "Partyräume"], ["/loesungen/sitzungszimmer", "Sitzungszimmer"], ["/loesungen/seminarraeume", "Seminarräume"], ["/loesungen/fotostudios", "Fotostudios"], ["/loesungen/proberaeume", "Proberäume"], ["/loesungen/tanzstudios", "Tanzstudios"]] },
-  { title: "Hilfe", links: [["/faq", "Häufige Fragen"], ["/hilfe", "Wissensdatenbank"], ["/kontakt", "Kontakt"], ["/login", "Anmelden"]] },
+  { title: "Lösungen", links: [["/loesungen/eventraeume", "Eventräume"], ["/loesungen/partyraeume", "Partyräume"], ["/loesungen/sitzungszimmer", "Sitzungszimmer"], ["/loesungen/seminarraeume", "Seminarräume"], ["/loesungen/fotostudios", "Fotostudios"], ["/loesungen/proberaeume", "Proberäume"], ["/loesungen/tanzstudios", "Tanzstudios"], ["/loesungen/gemeinschaftsraeume", "Vereinslokale"]] },
+  { title: "Hilfe", links: [["/faq", "Häufige Fragen"], ["/ratgeber", "Ratgeber"], ["/hilfe", "Wissensdatenbank"], ["/kontakt", "Kontakt"], ["/login", "Anmelden"]] },
   { title: "Rechtliches", links: [["/rechtliches/impressum", "Impressum"], ["/rechtliches/datenschutz", "Datenschutz"], ["/rechtliches/agb", "AGB"], ["/rechtliches/nutzungsbedingungen", "Nutzungsbedingungen"], ["/rechtliches/auftragsbearbeitung", "Auftragsbearbeitung"]] },
 ];
 
