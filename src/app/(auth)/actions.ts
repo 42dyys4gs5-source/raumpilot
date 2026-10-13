@@ -15,6 +15,7 @@ import { kickJobs } from "@/lib/jobs/kick";
 import { enqueue, enqueueEmail } from "@/lib/jobs/queue";
 import { audit } from "@/lib/security/audit";
 import { decrypt, sha256 } from "@/lib/security/crypto";
+import { findReferrer } from "@/lib/billing/referrals";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { requestInfo } from "@/lib/security/request";
 import { looksLikeBot, verifyTurnstile } from "@/lib/security/turnstile";
@@ -88,6 +89,7 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
 
   const passwordHash = await hashPassword(password);
   const slug = await uniqueOrgSlug(d.company);
+  const referrer = await findReferrer(str(fd, "ref"));
   const userId = await db.transaction(async (tx) => {
     const [user] = await tx.insert(schema.users).values({ email: d.email, name: d.name, phone: d.phone ?? null, passwordHash }).returning();
     const [org] = await tx
@@ -105,6 +107,7 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
         vatNumber: d.vatNumber ?? null,
         vatRegistered: !!d.vatNumber,
         planKey: null,
+        referredByOrgId: referrer?.id ?? null,
       })
       .returning();
     await tx.insert(schema.memberships).values({ orgId: org.id, userId: user.id, role: "owner" });
@@ -114,7 +117,7 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
     return user.id;
   });
   await sendVerification(userId, d.name, d.email);
-  await audit("user.registered", { userId, data: { plan: d.plan ?? null } });
+  await audit("user.registered", { userId, data: { plan: d.plan ?? null, referredBy: referrer?.id ?? null } });
   await createSession(userId);
   kickJobs();
   redirect(`/email-bestaetigen${d.plan ? `?tarif=${d.plan}` : ""}`);

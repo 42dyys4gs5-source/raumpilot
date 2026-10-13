@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   bigserial,
   boolean,
   customType,
@@ -143,6 +144,11 @@ export const organizations = pgTable(
     onboardingCompletedAt: ts("onboarding_completed_at"),
     suspendedAt: ts("suspended_at"),
     suspendedReason: text("suspended_reason"),
+    /** Personal referral code for raumvia.ch/registrieren?ref=… (created on first use). */
+    referralCode: text("referral_code").unique(),
+    referredByOrgId: uuid("referred_by_org_id").references((): AnyPgColumn => organizations.id, { onDelete: "set null" }),
+    /** Set once both sides received the referral bonus (after the referred organisation's first paid invoice). */
+    referralRewardedAt: ts("referral_rewarded_at"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -626,6 +632,8 @@ export const plans = pgTable("plans", {
   priceMonthly: integer("price_monthly").notNull(),
   currency: text("currency").notNull().default("CHF"),
   stripePriceId: text("stripe_price_id"),
+  /** Stripe price for annual billing (12 months for the price of 10). */
+  stripePriceIdYearly: text("stripe_price_id_yearly"),
   maxRooms: integer("max_rooms").notNull(),
   maxLocations: integer("max_locations").notNull(),
   maxMembers: integer("max_members").notNull(),
@@ -648,6 +656,8 @@ export const subscriptions = pgTable(
     planKey: text("plan_key").notNull(),
     status: text("status").notNull(),
     amountMonthly: integer("amount_monthly").notNull().default(0),
+    /** Billing interval of the Stripe price ("month" | "year"); amountMonthly is always normalised per month. */
+    billingInterval: text("billing_interval").notNull().default("month"),
     currentPeriodEnd: ts("current_period_end"),
     cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
     canceledAt: ts("canceled_at"),

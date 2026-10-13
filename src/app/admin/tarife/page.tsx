@@ -26,7 +26,8 @@ export default async function PlansAdmin() {
                 <Field label="Name" htmlFor={`n${p.key}`}><Input id={`n${p.key}`} name="name" defaultValue={p.name} /></Field>
                 <Field label="Beschreibung" htmlFor={`d${p.key}`}><Input id={`d${p.key}`} name="description" defaultValue={p.description} /></Field>
                 <Field label="Preis/Monat (CHF)" htmlFor={`p${p.key}`}><Input id={`p${p.key}`} name="priceMonthly" defaultValue={toInputValue(p.priceMonthly)} /></Field>
-                <Field label="Stripe-Preis-ID" htmlFor={`s${p.key}`}><Input id={`s${p.key}`} name="stripePriceId" defaultValue={p.stripePriceId ?? ""} placeholder="price_…" /></Field>
+                <Field label="Stripe-Preis-ID (monatlich)" htmlFor={`s${p.key}`}><Input id={`s${p.key}`} name="stripePriceId" defaultValue={p.stripePriceId ?? ""} placeholder="price_…" /></Field>
+                <Field label="Stripe-Preis-ID (jährlich, 10 × Monatspreis)" htmlFor={`sy${p.key}`} hint="Leer lassen, wenn kein Jahresabo angeboten wird."><Input id={`sy${p.key}`} name="stripePriceIdYearly" defaultValue={p.stripePriceIdYearly ?? ""} placeholder="price_…" /></Field>
                 <div className="grid grid-cols-3 gap-2">
                   <Field label="Räume" htmlFor={`r${p.key}`}><Input id={`r${p.key}`} name="maxRooms" type="number" defaultValue={p.maxRooms} /></Field>
                   <Field label="Standorte" htmlFor={`l${p.key}`}><Input id={`l${p.key}`} name="maxLocations" type="number" defaultValue={p.maxLocations} /></Field>

@@ -2,11 +2,13 @@ import { desc, eq } from "drizzle-orm";
 import { ExternalLink } from "lucide-react";
 import { ActionForm, SubmitButton } from "@/components/ui/action-form";
 import { Alert, Badge, Card, CardBody, CardHeader, PageHeader, Table } from "@/components/ui/card";
-import { PlanCards } from "@/components/billing/plan-cards";
+import { CopyField } from "@/components/ui/copy-field";
+import { IntervalToggle, PlanCards } from "@/components/billing/plan-cards";
 import { requireOrg } from "@/lib/auth/guards";
-import { listPlans, roomUsage } from "@/lib/billing/entitlements";
+import { ensureReferralCode, referralStats, referralUrl } from "@/lib/billing/referrals";
+import { listPlans, parseInterval, roomUsage, yearlyAvailable } from "@/lib/billing/entitlements";
 import { db, schema } from "@/lib/db";
-import { paymentsEnabled } from "@/lib/env";
+import { env, paymentsEnabled } from "@/lib/env";
 import { vatNote } from "@/lib/settings";
 import { formatDate } from "@/lib/utils/dates";
 import { formatMoney } from "@/lib/utils/money";
@@ -24,16 +26,20 @@ const SUB_STATUS: Record<string, { label: string; tone: "green" | "amber" | "red
   none: { label: "Kein Abo", tone: "neutral" },
 };
 
-export default async function SubscriptionPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+export default async function SubscriptionPage({ searchParams }: { searchParams: Promise<{ status?: string; abrechnung?: string }> }) {
   const ctx = await requireOrg();
-  const { status } = await searchParams;
-  const [plans, subs, invoices, used, note] = await Promise.all([
+  const { status, abrechnung } = await searchParams;
+  const [plans, subs, invoices, used, note, refCode, refStats] = await Promise.all([
     listPlans(),
     db.select().from(schema.subscriptions).where(eq(schema.subscriptions.orgId, ctx.org.id)).orderBy(desc(schema.subscriptions.createdAt)),
     db.select().from(schema.invoices).where(eq(schema.invoices.orgId, ctx.org.id)).orderBy(desc(schema.invoices.createdAt)).limit(24),
     roomUsage(ctx.org.id),
     vatNote(),
+    ensureReferralCode(ctx.org.id),
+    referralStats(ctx.org.id),
   ]);
+  const yearly = yearlyAvailable(plans, env.PAYMENTS_MODE);
+  const interval = yearly ? parseInterval(abrechnung) : "month";
   const current = subs.find((s) => ["active", "trialing", "past_due"].includes(s.status)) ?? subs[0];
   const st = SUB_STATUS[ctx.org.subscriptionStatus] ?? { label: ctx.org.subscriptionStatus, tone: "neutral" as const };
   const isOwner = ctx.role === "owner";
@@ -50,7 +56,7 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
         <CardBody>
           {ctx.plan ? (
             <div className="grid gap-4 sm:grid-cols-3">
-              <div><p className="text-sm text-ink-500">Tarif</p><p className="font-semibold">{ctx.plan.name}</p></div>
+              <div><p className="text-sm text-ink-500">Tarif</p><p className="font-semibold">{ctx.plan.name}{current?.source === "stripe" ? (current.billingInterval === "year" ? " · jährlich" : " · monatlich") : ""}</p></div>
               <div><p className="text-sm text-ink-500">Räume</p><p className="font-semibold">{used} von {ctx.plan.maxRooms}</p></div>
               <div>
                 <p className="text-sm text-ink-500">{current?.cancelAtPeriodEnd ? "Endet am" : current?.status === "trialing" ? "Testphase bis" : "Nächste Verlängerung"}</p>
@@ -75,12 +81,27 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
         <section className="mb-10">
           <h2 className="mb-4 text-lg font-semibold">Tarif wählen</h2>
           {isOwner ? (
-            <PlanCards plans={plans} currentKey={ctx.plan?.key} action={subscribeAction} vatNote={note} />
+            <>
+              {yearly && <IntervalToggle basePath="/app/abonnement" interval={interval} />}
+              <PlanCards plans={plans} currentKey={ctx.plan?.key} action={subscribeAction} interval={interval} vatNote={note} />
+            </>
           ) : (
             <Alert tone="info">Nur die Kontoinhaberin bzw. der Kontoinhaber kann das Abo verwalten.</Alert>
           )}
         </section>
       )}
+
+      <Card className="mb-8" id="empfehlen">
+        <CardHeader title="Raumvia weiterempfehlen – 1 Monat gratis" description="Kennen Sie andere Vermieterinnen oder Vermieter? Teilen Sie Ihren persönlichen Link. Sobald die neue Firma ihre erste Abo-Rechnung bezahlt hat, erhalten Sie beide einen Monat Ihres Tarifs gutgeschrieben." />
+        <CardBody className="space-y-4">
+          <CopyField label="Ihr Empfehlungslink" value={referralUrl(refCode)} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><p className="text-sm text-ink-500">Über Ihren Link registriert</p><p className="font-semibold">{refStats.signedUp}</p></div>
+            <div><p className="text-sm text-ink-500">Bonus erhalten</p><p className="font-semibold">{refStats.rewarded} {refStats.rewarded === 1 ? "Monat" : "Monate"}</p></div>
+          </div>
+          <p className="text-xs text-ink-500">Die Gutschrift wird mit Ihrer nächsten Abo-Rechnung verrechnet. Voraussetzung ist ein laufendes Abo über die Online-Abrechnung.</p>
+        </CardBody>
+      </Card>
 
       <Card>
         <CardHeader title="Rechnungen" description="Rechnungen und Zahlungsbelege werden von Stripe erstellt und Ihnen zusätzlich per E-Mail zugestellt." />

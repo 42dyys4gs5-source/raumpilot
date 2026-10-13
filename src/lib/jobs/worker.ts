@@ -2,6 +2,7 @@ import { and, eq, gte, lt, sql } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
+import { grantReferralReward } from "@/lib/billing/referrals";
 import { expireManualPlans } from "@/lib/billing/subscription";
 import { expireStale, sendDueReminders } from "@/lib/booking/engine";
 import { syncFeed } from "@/lib/calendar/sync";
@@ -15,6 +16,10 @@ import { enqueue, enqueueEmail, type JobType } from "./queue";
 type Job = typeof schema.jobs.$inferSelect;
 
 const handlers: Record<JobType, (job: Job) => Promise<void>> = {
+  "referral.reward": async (job) => {
+    await grantReferralReward((job.payload as { orgId: string }).orgId);
+  },
+
   "email.send": async (job) => {
     await sendEmail(job.payload as unknown as OutgoingEmail, job.dedupeKey ?? `job-${job.id}`);
   },

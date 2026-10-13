@@ -47,6 +47,8 @@ export interface PaymentGateway {
   createConnectDashboardLink(accountId: string): Promise<string | null>;
   retrieveAccount(accountId: string): Promise<AccountStatus>;
   cancelSubscriptionNow(subscriptionId: string): Promise<void>;
+  /** Credit (negative balance) on a platform customer, offset against the next subscription invoice. */
+  creditCustomer(p: { customerId: string; amount: number; currency: string; description: string; idempotencyKey: string }): Promise<void>;
 }
 
 export function gateway(): PaymentGateway {

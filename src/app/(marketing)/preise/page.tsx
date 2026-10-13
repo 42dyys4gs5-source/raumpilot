@@ -1,27 +1,29 @@
 import { Check, Minus } from "lucide-react";
 import type { Metadata } from "next";
-import { PlanCards } from "@/components/billing/plan-cards";
+import { IntervalToggle, PlanCards } from "@/components/billing/plan-cards";
 import { PageHero } from "@/components/marketing/page-hero";
 import { FEATURE_LABELS } from "@/config/plans";
-import { listPlans } from "@/lib/billing/entitlements";
+import { listPlans, parseInterval, yearlyAvailable } from "@/lib/billing/entitlements";
 import type { PlanFeatures } from "@/lib/db/schema";
-import { appUrl } from "@/lib/env";
+import { appUrl, env } from "@/lib/env";
 import { vatNote } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Preise – ab CHF 39.– pro Monat",
-  description: "Transparente Preise für Raumvia: Starter CHF 39.–, Professional CHF 69.–, Business CHF 129.– pro Monat. Monatlich kündbar, keine Provision auf Buchungen.",
+  description: "Transparente Preise für Raumvia: Starter CHF 39.–, Professional CHF 69.–, Business CHF 129.– pro Monat. Monatlich kündbar oder jährlich mit 2 Monaten gratis, keine Provision auf Buchungen.",
   alternates: { canonical: appUrl("/preise") },
 };
 
-export default async function PricingPage() {
+export default async function PricingPage({ searchParams }: { searchParams: Promise<{ abrechnung?: string }> }) {
   const [plans, note] = await Promise.all([listPlans(), vatNote()]);
   const active = plans.filter((p) => p.active);
+  const yearly = yearlyAvailable(plans, env.PAYMENTS_MODE);
+  const interval = yearly ? parseInterval((await searchParams).abrechnung) : "month";
   return (
     <>
-      <PageHero eyebrow="Preise" title="Ein fairer Monatspreis. Keine Provision." intro="Wählen Sie den Tarif, der zu Ihrer Anzahl Räume passt. Sie können jederzeit wechseln oder auf Ende der Laufzeit kündigen." />
+      <PageHero eyebrow="Preise" title="Ein fairer Monatspreis. Keine Provision." intro="Wählen Sie den Tarif, der zu Ihrer Anzahl Räume passt. Monatlich kündbar – oder jährlich bezahlen und 2 Monate sparen. Wechsel jederzeit möglich." />
       <section className="py-12 sm:py-16">
-        <div className="container-page"><PlanCards plans={active} hrefFor={(k) => `/registrieren?tarif=${k}`} ctaLabel="Kostenlos starten" vatNote={note} /></div>
+        <div className="container-page">{yearly && <IntervalToggle basePath="/preise" interval={interval} />}<PlanCards plans={active} interval={interval} hrefFor={(k) => `/registrieren?tarif=${k}${interval === "year" ? "&abrechnung=jaehrlich" : ""}`} ctaLabel="Kostenlos starten" vatNote={note} /></div>
         <div className="container-page mt-16 sm:mt-20">
           <p className="eyebrow">Übersicht</p>
           <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">Tarife im Vergleich</h2>

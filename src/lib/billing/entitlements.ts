@@ -10,6 +10,15 @@ type Org = typeof schema.organizations.$inferSelect;
 /** Subscription states that grant access to paid features. past_due = grace period during Stripe retries. */
 export const ACCESS_STATUSES = new Set(["active", "trialing", "past_due"]);
 
+export type BillingInterval = "month" | "year";
+
+/** Annual billing: 12 months for the price of 10. */
+export const YEARLY_MONTHS_CHARGED = 10;
+export const yearlyPrice = (p: Pick<Plan, "priceMonthly">) => p.priceMonthly * YEARLY_MONTHS_CHARGED;
+/** Annual billing is only offered once every active plan has an annual Stripe price (or outside of Stripe mode, e.g. tests). */
+export const yearlyAvailable = (plans: Plan[], paymentsMode: string) => paymentsMode !== "stripe" || plans.filter((p) => p.active).every((p) => !!p.stripePriceIdYearly);
+export const parseInterval = (v: unknown): BillingInterval => (v === "year" || v === "jaehrlich" ? "year" : "month");
+
 export async function listPlans(tx: DbOrTx = db): Promise<Plan[]> {
   const rows = await tx.select().from(schema.plans).orderBy(schema.plans.sort);
   if (rows.length) return rows;
@@ -18,6 +27,7 @@ export async function listPlans(tx: DbOrTx = db): Promise<Plan[]> {
     ...p,
     currency: "CHF",
     stripePriceId: null,
+    stripePriceIdYearly: null,
     active: true,
     updatedAt: new Date(0),
   }));
