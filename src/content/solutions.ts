@@ -154,6 +154,30 @@ export const SOLUTIONS: Solution[] = [
     body: [{ h: "Ausstattung zeigen", p: "Schwingboden, Spiegelwand, Musikanlage, Umkleide: Wählen Sie die Ausstattung aus der Liste und laden Sie Fotos hoch." }],
     faq: [{ q: "Eignet sich Raumvia auch für Yogaräume?", a: "Ja. Wählen Sie die Kategorie «Yoga- & Bewegungsraum»; alle Funktionen sind identisch." }],
   },
+  {
+    slug: "gemeinschaftsraeume",
+    category: "gemeinschaftsraum",
+    name: "Vereinslokale & Gemeinschaftsräume",
+    metaTitle: "Vereinslokal und Gemeinschaftsraum online vermieten – Raumbuchung für Vereine",
+    metaDescription: "Vereinslokale, Quartiertreffs, Genossenschafts- und Kirchgemeinderäume einfach vermieten: öffentlicher Belegungskalender, Freigabe von Anfragen, Mitgliederrabatte und Onlinezahlung.",
+    headline: "Vereinslokal vermieten – ohne Telefonkette und Kassabuch",
+    intro: "Bei Vereinen, Genossenschaften und Kirchgemeinden hängt die Raumvermietung oft an einer einzigen ehrenamtlichen Person. Mit Raumvia sehen Interessierte freie Termine selbst, buchen oder fragen an – und die Zahlung ist erledigt, bevor jemand den Schlüssel braucht.",
+    pains: ["Alle Anfragen laufen über eine Person", "Mitglieder- und Externe-Preise von Hand rechnen", "Einzahlungen kontrollieren und nachfassen", "Belegung im Papierkalender oder in einer Tabelle"],
+    features: [
+      { title: "Anfrage mit Freigabe", text: "Jede Vermietung kann zuerst geprüft werden. Nach der Zusage erhält der Mieter automatisch Bescheid und auf Wunsch den Zahlungslink." },
+      { title: "Öffentlicher Belegungskalender", text: "Alle sehen auf einen Blick, wann der Raum frei ist – ohne Namen oder Details der Mieter." },
+      { title: "Mitgliederrabatt", text: "Mitglieder erhalten einen Gutscheincode, Externe zahlen den regulären Preis (ab Tarif Professional)." },
+      { title: "Zahlung erledigt", text: "Online per Karte oder TWINT bei der Buchung – oder wie bisher per Rechnung bzw. bar, mit Markierung im System." },
+    ],
+    body: [
+      { h: "Für ehrenamtliche Verwaltung gemacht", p: "Benachrichtigungen kommen per E-Mail, Bestätigungen und Erinnerungen an die Mieter verschickt Raumvia automatisch. Im Tarif Business können mehrere Vorstandsmitglieder mit eigenen Zugängen mitarbeiten." },
+      { h: "Hausordnung und Reinigung", p: "Hausordnung und Mietbedingungen werden bei der Buchung akzeptiert. Reinigungszeiten nach einem Anlass blockiert Raumvia als Puffer automatisch." },
+    ],
+    faq: [
+      { q: "Können wir Mitgliedern den Raum günstiger vermieten?", a: "Ja, mit Gutscheincodes für Mitglieder (Prozent- oder Frankenrabatt), verfügbar ab Tarif Professional." },
+      { q: "Wir möchten jede Anfrage zuerst im Vorstand prüfen. Geht das?", a: "Ja. Stellen Sie den Raum auf «Anfrage mit Freigabe». Der Termin bleibt bis zu Ihrer Entscheidung reserviert; nach Ablauf der Frist wird er automatisch freigegeben." },
+    ],
+  },
 ];
 
 export const getSolution = (slug: string) => SOLUTIONS.find((s) => s.slug === slug);

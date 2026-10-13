@@ -16,12 +16,14 @@ const SOLUTIONS = [
   ["fotostudios", "Fotostudios"],
   ["proberaeume", "Proberäume"],
   ["tanzstudios", "Tanz- & Yogastudios"],
+  ["gemeinschaftsraeume", "Vereinslokale & Gemeinschaftsräume"],
 ] as const;
 
 const LINKS = [
   { href: "/funktionen", label: "Funktionen" },
   { href: "/preise", label: "Preise" },
   { href: "/so-funktionierts", label: "So funktioniert's" },
+  { href: "/ratgeber", label: "Ratgeber" },
   { href: "/faq", label: "FAQ" },
 ];
 

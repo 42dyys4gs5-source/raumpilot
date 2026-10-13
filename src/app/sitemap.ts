@@ -1,5 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import type { MetadataRoute } from "next";
+import { GUIDES } from "@/content/guides";
 import { HELP_ARTICLES } from "@/content/help";
 import { LEGAL_DOCS } from "@/content/legal";
 import { SOLUTIONS } from "@/content/solutions";
@@ -12,7 +13,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/registrieren"].map((p) => ({
+  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/ratgeber", "/registrieren"].map((p) => ({
     url: appUrl(p),
     lastModified: now,
     changeFrequency: "weekly" as const,
@@ -37,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...statics,
     ...SOLUTIONS.map((s) => ({ url: appUrl(`/loesungen/${s.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
+    ...GUIDES.map((g) => ({ url: appUrl(`/ratgeber/${g.slug}`), lastModified: new Date(g.updated), changeFrequency: "monthly" as const, priority: 0.7 })),
     ...HELP_ARTICLES.map((a) => ({ url: appUrl(`/hilfe/${a.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
     ...LEGAL_DOCS.map((d) => ({ url: appUrl(`/rechtliches/${d.slug}`), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
     ...rooms.map((r) => ({ url: appUrl(`/r/${r.slug}`), lastModified: r.updatedAt, changeFrequency: "weekly" as const, priority: 0.6 })),
