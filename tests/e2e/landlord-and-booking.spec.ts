@@ -11,9 +11,7 @@ test("Vermieterin registriert sich, richtet Raum ein, schliesst Abo ab und verö
   expect(slug).toContain("saal-seeblick");
   await page.goto(`/r/${slug}`);
   await expect(page.getByRole("heading", { level: 1, name: "Saal Seeblick" })).toBeVisible();
-  const mails = await mailTemplates(email);
-  expect(mails).toContain("auth.verify_email");
-  expect(mails).toContain("subscription.started");
+  await expect.poll(() => mailTemplates(email)).toEqual(expect.arrayContaining(["auth.verify_email", "subscription.started"]));
 });
 
 test("Kunde bucht (Bezahlung vor Ort) und erhält Bestätigung; Vermieterin sieht Buchung", async ({ page, browser }) => {
@@ -21,9 +19,8 @@ test("Kunde bucht (Bezahlung vor Ort) und erhält Bestätigung; Vermieterin sieh
   await page.getByRole("button", { name: "Verbindlich buchen" }).click();
   await expect(page).toHaveURL(/\/buchung\//);
   await expect(page.getByText("Bestätigt", { exact: true })).toBeVisible();
-  const mails = await mailTemplates(c.email);
-  expect(mails).toContain("booking.confirmed");
-  expect((await mailTemplates(email))).toContain("landlord.new_booking");
+  await expect.poll(() => mailTemplates(c.email)).toContain("booking.confirmed");
+  await expect.poll(() => mailTemplates(email)).toContain("landlord.new_booking");
 
   const ctx = await browser.newContext();
   const p2 = await ctx.newPage();
@@ -52,7 +49,7 @@ test("Kunde storniert selbst über den Link", async ({ page }) => {
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Verbindlich stornieren" }).click();
   await expect(page.getByText("Ihre Buchung wurde storniert.")).toBeVisible();
-  expect(await mailTemplates(c.email)).toContain("booking.cancelled");
+  await expect.poll(() => mailTemplates(c.email)).toContain("booking.cancelled");
 });
 
 test("Onlinezahlung: Stripe verbinden, bezahlen, Beleg, Stornierung mit Rückerstattung", async ({ page }) => {
@@ -79,18 +76,20 @@ test("Onlinezahlung: Stripe verbinden, bezahlen, Beleg, Stornierung mit Rückers
   await expect(page.getByText("Zahlung erhalten – Buchung bestätigt")).toBeVisible();
   await expect(page.getByText("Online bezahlt", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Zahlungsbeleg" }).click();
-  // Wait for the receipt to actually load – otherwise goBack() races the navigation and lands on the checkout page.
-  await expect(page).toHaveURL(/\/beleg/);
-  await expect(page.getByText("Zahlungsbeleg").first()).toBeVisible();
+  // Wait for the receipt page itself: the booking page also shows the word "Zahlungsbeleg" (link), and going back
+  // while the client navigation is still pending lets it land on the receipt afterwards.
+  await expect(page).toHaveURL(/\/beleg$/);
+  await expect(page.getByRole("button", { name: /Drucken/ })).toBeVisible();
   await page.goBack();
-  await expect(page).toHaveURL(/\/buchung\/[^/]+$|\/buchung\/[^/]+\?/);
+  await expect(page).not.toHaveURL(/\/beleg$/);
+  await expect(page).toHaveURL(/\/buchung\/[^/?]+(\?|$)/);
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Verbindlich stornieren" }).click();
   await expect(page.getByText(/Die Rückerstattung ist veranlasst/)).toBeVisible();
   await page.reload();
   await expect(page.getByText("Rückerstattet").first()).toBeVisible();
+  await expect.poll(() => mailTemplates(c.email)).toContain("booking.receipt");
   const mails = await mailTemplates(c.email);
-  expect(mails).toContain("booking.receipt");
   expect(mails.filter((m) => m === "booking.confirmed")).toHaveLength(1);
 });
 
@@ -110,7 +109,7 @@ test("Zahlungsfehler wird dem Kunden gemeldet", async ({ page }) => {
   await page.getByRole("button", { name: "Weiter zur Zahlung" }).click();
   await page.getByRole("button", { name: "Zahlung fehlgeschlagen" }).click();
   await expect(page).toHaveURL(/zahlung=abgebrochen/);
-  expect(await mailTemplates(c.email)).toContain("booking.payment_failed");
+  await expect.poll(() => mailTemplates(c.email)).toContain("booking.payment_failed");
 });
 
 test("Buchungsanfrage: Vermieterin nimmt an, Kunde bezahlt über Link", async ({ page, browser }) => {
@@ -133,7 +132,7 @@ test("Buchungsanfrage: Vermieterin nimmt an, Kunde bezahlt über Link", async ({
   await page.getByRole("link", { name: /Uhr/ }).first().click();
   await page.getByRole("button", { name: "Annehmen" }).click();
   await expect(page.getByText("Anfrage angenommen.")).toBeVisible();
-  expect(await mailTemplates(c.email)).toContain("booking.awaiting_payment");
+  await expect.poll(() => mailTemplates(c.email)).toContain("booking.awaiting_payment");
 
   await customer.goto(manageUrl);
   await customer.getByRole("link", { name: "Jetzt bezahlen" }).click();
@@ -154,10 +153,9 @@ test("Abo: Kündigung zum Laufzeitende, Verlängerung und fehlgeschlagene Zahlun
   await page.getByRole("button", { name: /Tarif wechseln/ }).click();
   await page.getByRole("button", { name: "Zum Laufzeitende kündigen" }).click();
   await expect(page.getByText(/Ihr Abo ist gekündigt/)).toBeVisible();
-  const mails = await mailTemplates(email);
-  expect(mails).toContain("subscription.renewed");
-  expect(mails).toContain("subscription.payment_failed");
-  expect(mails).toContain("subscription.cancel_scheduled");
+  await expect.poll(() => mailTemplates(email)).toEqual(
+    expect.arrayContaining(["subscription.renewed", "subscription.payment_failed", "subscription.cancel_scheduled"]),
+  );
 });
 
 test("Passwort zurücksetzen", async ({ page }) => {

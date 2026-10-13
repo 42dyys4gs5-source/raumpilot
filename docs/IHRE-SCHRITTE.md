@@ -41,8 +41,8 @@ Online beim IGE (**ige.ch** › Marken › Marke anmelden) › Wortmarke `RAUMVI
 
 (Gebühren und Formulierungen vor dem Absenden in der IGE-Maske prüfen; das IGE bietet auch eine kostenpflichtige Vorprüfung an.)
 
-## 10. Rechtstexte prüfen lassen
-Impressum, Datenschutz, AGB, Nutzungsbedingungen und Auftragsbearbeitung einer Fachperson vorlegen (Website › Rechtliches). Danach entferne ich den Entwurfshinweis.
+## 10. Rechtstexte prüfen lassen ✅ erledigt (12.10.2026)
+Rechtstexte geprüft; der Entwurfshinweis auf den Seiten unter Rechtliches ist entfernt.
 
 ---
 

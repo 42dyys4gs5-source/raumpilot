@@ -20,14 +20,16 @@ export default async function PricingPage() {
   return (
     <>
       <PageHero eyebrow="Preise" title="Ein fairer Monatspreis. Keine Provision." intro="Wählen Sie den Tarif, der zu Ihrer Anzahl Räume passt. Sie können jederzeit wechseln oder auf Ende der Laufzeit kündigen." />
-      <section className="py-16">
+      <section className="py-12 sm:py-16">
         <div className="container-page"><PlanCards plans={active} hrefFor={(k) => `/registrieren?tarif=${k}`} ctaLabel="Kostenlos starten" vatNote={note} /></div>
-        <div className="container-page mt-16">
-          <h2 className="text-2xl font-semibold">Tarife im Vergleich</h2>
-          <div className="mt-6 overflow-x-auto rounded-2xl border border-ink-200">
+        <div className="container-page mt-16 sm:mt-20">
+          <p className="eyebrow">Übersicht</p>
+          <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">Tarife im Vergleich</h2>
+          <p className="mt-2 text-sm text-ink-500 sm:hidden">Tabelle seitlich wischen, um alle Tarife zu sehen.</p>
+          <div className="mt-6 overflow-x-auto rounded-2xl border border-ink-200 bg-white shadow-soft">
             <table className="w-full min-w-[560px] text-sm">
-              <thead className="bg-ink-50"><tr><th className="px-4 py-3 text-left font-medium text-ink-600">Funktion</th>{active.map((p) => <th key={p.key} className="px-4 py-3 text-center font-semibold">{p.name}</th>)}</tr></thead>
-              <tbody className="divide-y divide-ink-100">
+              <thead className="bg-ink-50"><tr><th className="sticky left-0 bg-ink-50 px-4 py-3 text-left font-medium text-ink-600">Funktion</th>{active.map((p) => <th key={p.key} className="px-4 py-3 text-center font-semibold">{p.name}</th>)}</tr></thead>
+              <tbody className="divide-y divide-ink-100 [&_tr>td:first-child]:sticky [&_tr>td:first-child]:left-0 [&_tr>td:first-child]:bg-white [&_tr>td:first-child]:font-medium [&_tr>td:first-child]:text-ink-800">
                 <tr><td className="px-4 py-3">Räume</td>{active.map((p) => <td key={p.key} className="px-4 py-3 text-center">{p.maxRooms === 1 ? "1" : `bis ${p.maxRooms}`}{p.key === "business" ? " (Fair Use)" : ""}</td>)}</tr>
                 <tr><td className="px-4 py-3">Standorte</td>{active.map((p) => <td key={p.key} className="px-4 py-3 text-center">{p.maxLocations}</td>)}</tr>
                 <tr><td className="px-4 py-3">Benutzer</td>{active.map((p) => <td key={p.key} className="px-4 py-3 text-center">{p.maxMembers}</td>)}</tr>
@@ -40,7 +42,7 @@ export default async function PricingPage() {
               </tbody>
             </table>
           </div>
-          <div className="mt-8 grid gap-4 text-sm text-ink-600 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 text-sm leading-relaxed text-ink-600 md:grid-cols-3 [&>p]:rounded-2xl [&>p]:bg-ink-50 [&>p]:p-5 [&>p]:ring-1 [&>p]:ring-ink-100">
             <p><strong className="text-ink-900">Stripe-Gebühren:</strong> Für Onlinezahlungen Ihrer Mieter belastet Stripe Ihnen die Transaktionsgebühren direkt gemäss Ihrem Stripe-Vertrag. Raumvia verdient daran nichts.</p>
             <p><strong className="text-ink-900">Zahlung per Rechnung oder vor Ort:</strong> Ohne Onlinezahlung fallen keine Transaktionsgebühren an.</p>
             <p><strong className="text-ink-900">Fair Use Business:</strong> bis 25 Räume, 10 Standorte und 10 Benutzer. Darüber hinaus erstellen wir gerne ein Angebot.</p>

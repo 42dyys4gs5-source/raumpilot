@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils/cn";
 import { FormStartedField } from "./action-form";
 
 const field =
-  "block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-ink-900 shadow-sm ring-1 ring-ink-200 ring-inset placeholder:text-ink-400 focus:ring-2 focus:ring-brand-500 focus:outline-none disabled:bg-ink-50 disabled:text-ink-500 aria-[invalid=true]:ring-red-400";
+  "block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-ink-900 shadow-sm ring-1 ring-ink-200 ring-inset transition-shadow duration-150 placeholder:text-ink-400 hover:ring-ink-300 focus:ring-2 focus:ring-brand-500 focus:outline-none disabled:bg-ink-50 disabled:text-ink-500 aria-[invalid=true]:ring-red-400";
 
 export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(field, "h-10", className)} {...props} />;

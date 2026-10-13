@@ -45,13 +45,25 @@ export function PriceSummary({ d }: { d: PublicRoom }) {
 
 export function RoomDetails({ d }: { d: PublicRoom }) {
   const r = d.room;
-  const byDay = WEEKDAYS.map((w) => ({ ...w, windows: d.hours.filter((h) => h.weekday === w.n) }));
+  const byDay = WEEKDAYS.map((w) => {
+    const windows = d.hours.filter((h) => h.weekday === w.n);
+    const text = windows.length ? windows.map((h) => `${minutesToTime(h.startMinute)}–${minutesToTime(h.endMinute)}${h.endMinute > 1440 ? " (Folgetag)" : ""}`).join(", ") : "geschlossen";
+    return { ...w, text };
+  });
+  // Consecutive days with identical times are shown as one row ("Montag – Freitag").
+  const groups: { from: string; to: string; text: string; key: number }[] = [];
+  for (const w of byDay) {
+    const last = groups.at(-1);
+    if (last && last.text === w.text) last.to = w.long;
+    else groups.push({ from: w.long, to: w.long, text: w.text, key: w.n });
+  }
+  const chip = "inline-flex items-center gap-1.5 rounded-full bg-ink-50 px-3 py-1.5 ring-1 ring-ink-100";
   return (
-    <div className="space-y-10">
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-600">
-        <span className="inline-flex items-center gap-1.5"><Users className="size-4 text-brand-700" /> bis {r.capacity} Personen</span>
-        {r.sizeSqm ? <span className="inline-flex items-center gap-1.5"><Ruler className="size-4 text-brand-700" /> {r.sizeSqm} m²</span> : null}
-        {r.city && <span className="inline-flex items-center gap-1.5"><MapPin className="size-4 text-brand-700" /> {[r.street, [r.postalCode, r.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</span>}
+    <div className="space-y-8 [&>section]:border-t [&>section]:border-ink-100 [&>section]:pt-8">
+      <div className="flex flex-wrap gap-2 text-sm text-ink-700">
+        <span className={chip}><Users className="size-4 text-brand-700" /> bis {r.capacity} Personen</span>
+        {r.sizeSqm ? <span className={chip}><Ruler className="size-4 text-brand-700" /> {r.sizeSqm} m²</span> : null}
+        {r.city && <span className={chip}><MapPin className="size-4 shrink-0 text-brand-700" /> {[r.street, [r.postalCode, r.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</span>}
       </div>
       {r.description && (
         <section>
@@ -74,11 +86,11 @@ export function RoomDetails({ d }: { d: PublicRoom }) {
       </section>
       <section>
         <h2 className="mb-3 text-xl font-semibold">Buchbare Zeiten</h2>
-        <dl className="grid max-w-md grid-cols-[110px_1fr] gap-y-1 text-sm">
-          {byDay.map((w) => (
-            <div key={w.n} className="contents">
-              <dt className="text-ink-500">{w.long}</dt>
-              <dd className="text-ink-800">{w.windows.length ? w.windows.map((h) => `${minutesToTime(h.startMinute)}–${minutesToTime(h.endMinute)}${h.endMinute > 1440 ? " (Folgetag)" : ""}`).join(", ") : "geschlossen"}</dd>
+        <dl className="max-w-md divide-y divide-ink-100 overflow-hidden rounded-xl text-sm ring-1 ring-ink-100">
+          {groups.map((g) => (
+            <div key={g.key} className="flex justify-between gap-4 px-4 py-2.5">
+              <dt className="text-ink-500">{g.from === g.to ? g.from : `${g.from} – ${g.to}`}</dt>
+              <dd className={g.text === "geschlossen" ? "text-ink-400" : "font-medium tabular-nums text-ink-800"}>{g.text}</dd>
             </div>
           ))}
         </dl>
@@ -119,7 +131,7 @@ export function RoomDetails({ d }: { d: PublicRoom }) {
 export function Gallery({ d }: { d: PublicRoom }) {
   const photos = d.photos;
   if (!photos.length) {
-    return <div className="grid h-28 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-ink-100 text-sm text-ink-500">{CATEGORY_LABELS[d.room.category]} · Fotos folgen</div>;
+    return <div className="grid h-28 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-ink-100 text-sm text-ink-500 ring-1 ring-inset ring-ink-100">{CATEGORY_LABELS[d.room.category]} · Fotos folgen</div>;
   }
   const [first, ...rest] = photos;
   return (

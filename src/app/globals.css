@@ -48,7 +48,8 @@
 @layer base {
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body { @apply bg-white text-ink-800 antialiased; font-feature-settings: "cv11", "ss01"; }
-  h1, h2, h3, h4 { @apply font-display text-ink-900; letter-spacing: -0.02em; }
+  h1, h2, h3, h4 { @apply font-display text-ink-900; letter-spacing: -0.02em; text-wrap: balance; }
+  p, li, dd { text-wrap: pretty; }
   :focus-visible { @apply outline-2 outline-offset-2 outline-brand-500; }
   ::selection { @apply bg-brand-100 text-brand-900; }
   [hidden] { display: none !important; }
@@ -60,6 +61,11 @@
 
 @utility container-page {
   @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+}
+
+/* Small uppercase label above section headings ("Kicker"). */
+@utility eyebrow {
+  @apply text-xs font-semibold uppercase tracking-[0.14em] text-brand-700;
 }
 
 @utility prose-rv {
