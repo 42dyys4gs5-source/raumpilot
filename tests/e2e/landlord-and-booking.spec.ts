@@ -24,7 +24,7 @@ test("Entwurf kann ohne Rechnungsadresse fortgesetzt und privat ohne Buchungsfun
   await page.getByRole("button", { name: "Raum erstellen" }).click();
   await expect(page.getByRole("heading", { name: "Wählen Sie Ihren Tarif" })).toBeVisible();
   await page.getByRole("link", { name: /Ohne Tarif fortfahren/ }).click();
-  await page.getByRole("button", { name: "Private Vorschau ansehen" }).click();
+  await page.getByRole("link", { name: "Private Vorschau ansehen" }).click();
   await expect(page.getByText(/Private Vorschau · Nur Ihr Team kann diese Seite sehen/)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Atelier Vorschau" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Buchungsmaske inaktiv/ })).toBeDisabled();

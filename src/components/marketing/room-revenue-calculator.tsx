@@ -43,18 +43,18 @@ export function RoomRevenueCalculator() {
             <label className="block text-sm font-medium text-ink-800" htmlFor="hourly-rate">Preis pro Stunde
               <span className="relative mt-2 block">
                 <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-medium text-ink-500">CHF</span>
-                <input id="hourly-rate" type="number" min={0} max={10000} step={0.05} inputMode="decimal" value={price} onChange={(e) => setBounded(setPrice, e.target.value, 10000)} className={`${inputClass} pl-14`} />
+                <input id="hourly-rate" aria-label="Mietpreis pro Stunde (CHF)" type="number" min={0} max={10000} step={0.05} inputMode="decimal" value={price} onChange={(e) => setBounded(setPrice, e.target.value, 10000)} className={`${inputClass} pl-14`} />
               </span>
             </label>
             <label className="block text-sm font-medium text-ink-800" htmlFor="weekly-hours">Stunden pro Woche
               <span className="relative mt-2 block">
-                <input id="weekly-hours" type="number" min={0} max={168} step={1} inputMode="numeric" value={hours} onChange={(e) => setBounded(setHours, e.target.value, 168)} className={`${inputClass} pr-14`} />
+                <input id="weekly-hours" aria-label="Buchbare Stunden pro Woche" type="number" min={0} max={168} step={1} inputMode="numeric" value={hours} onChange={(e) => setBounded(setHours, e.target.value, 168)} className={`${inputClass} pr-14`} />
                 <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm text-ink-500">Std.</span>
               </span>
             </label>
           </div>
           <label className="block rounded-2xl bg-ink-50/80 p-4 text-sm font-medium text-ink-800" htmlFor="occupancy">
-            <span className="flex items-center justify-between gap-3"><span>Erwartete Auslastung</span><output htmlFor="occupancy" className="rounded-full bg-white px-3 py-1 font-semibold text-brand-800 shadow-sm">{occupancy}%</output></span>
+            <span className="flex items-center justify-between gap-3"><span>Erwartete Auslastung:</span><output htmlFor="occupancy" className="rounded-full bg-white px-3 py-1 font-semibold text-brand-800 shadow-sm">{occupancy}%</output></span>
             <input id="occupancy" aria-label="Erwartete Auslastung in Prozent" type="range" min={0} max={100} step={1} value={occupancy} onChange={(e) => setBounded(setOccupancy, e.target.value, 100)} className="mt-4 block w-full cursor-pointer accent-brand-700" />
             <span className="mt-1 flex justify-between text-xs font-normal text-ink-500"><span>0% · kaum gebucht</span><span>100% · voll</span></span>
           </label>
@@ -65,7 +65,7 @@ export function RoomRevenueCalculator() {
             </summary>
             <div className="px-4 pb-4 pt-1">
               <label className="block text-sm font-medium text-ink-800" htmlFor="operating-costs">Monatliche Kosten (CHF)
-                <input id="operating-costs" type="number" min={0} max={1000000} step={10} inputMode="decimal" value={costs} onChange={(e) => setBounded(setCosts, e.target.value, 1000000)} className={inputClass} />
+                <input id="operating-costs" aria-label="Monatliche Betriebskosten (CHF, optional)" type="number" min={0} max={1000000} step={10} inputMode="decimal" value={costs} onChange={(e) => setBounded(setCosts, e.target.value, 1000000)} className={inputClass} />
               </label>
               <p className="mt-2 text-xs leading-relaxed text-ink-500">Die Kosten werden in der Schätzung nach Abzug angezeigt.</p>
             </div>
