@@ -45,7 +45,7 @@ test("Umsatzrechner lässt sich mit der Tastatur bedienen", async ({ page }) => 
   await occupancy.press("End");
   await expect(occupancy).toHaveValue("100");
   await expect(page.locator('output[for="occupancy"]')).toHaveText("100%");
-  await expect(page.getByText("CHF 6’933.33", { exact: true })).toBeVisible();
+  await expect(page.locator('[aria-live="polite"]')).toHaveText("CHF 6’933.33");
 });
 
 test("Kontaktformular erstellt eine Anfrage", async ({ page }) => {
