@@ -1,3 +1,4 @@
+import { PhotoGallery } from "@/components/booking/photo-gallery";
 import { Check, MapPin, Ruler, Users } from "lucide-react";
 import { durationOptions } from "@/lib/booking/availability";
 import { env } from "@/lib/env";
@@ -133,13 +134,5 @@ export function Gallery({ d }: { d: PublicRoom }) {
   if (!photos.length) {
     return <div className="grid h-28 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-ink-100 text-sm text-ink-500 ring-1 ring-inset ring-ink-100">{CATEGORY_LABELS[d.room.category]} · Fotos folgen</div>;
   }
-  const [first, ...rest] = photos;
-  return (
-    <div className="grid gap-2 overflow-hidden rounded-2xl sm:grid-cols-4 sm:grid-rows-2" style={{ maxHeight: 460 }}>
-      <img src={publicUrl(first.path)!} alt={first.alt ?? d.room.name} width={first.width} height={first.height} className="aspect-[4/3] size-full object-cover sm:col-span-2 sm:row-span-2 sm:aspect-auto" fetchPriority="high" />
-      {rest.slice(0, 4).map((p) => (
-        <img key={p.id} src={publicUrl(p.thumbPath)!} alt={p.alt ?? d.room.name} loading="lazy" className="hidden size-full object-cover sm:block" />
-      ))}
-    </div>
-  );
+  return <PhotoGallery photos={photos.map(p => ({ src: publicUrl(p.path)!, thumb: publicUrl(p.thumbPath)!, alt: p.alt ?? d.room.name, width: p.width, height: p.height }))} />;
 }

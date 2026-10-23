@@ -83,10 +83,10 @@ export default async function Home() {
           <div className="animate-fade-up">
             <p className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-brand-800 shadow-soft ring-1 ring-brand-200/70 backdrop-blur sm:text-sm"><Sparkles className="size-4 shrink-0 text-accent-500" /> Buchungssoftware für Raumvermieter in der Schweiz</p>
             <h1 className="mt-6 text-[2.5rem] font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.25rem]">Ihr Raum.<br />Online buchbar.<br /><span className="text-brand-700 xl:whitespace-nowrap">Ohne Telefon-Pingpong.</span></h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-600">Raumvia gibt Ihrem Event-, Party-, Seminar- oder Proberaum eine eigene Buchungsseite mit Echtzeit-Kalender, Onlinezahlung und automatischen Bestätigungen. Eingerichtet in einer Viertelstunde.</p>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-600">Raumvia gibt Ihrem Event-, Party-, Seminar- oder Proberaum eine eigene Buchungsseite mit Echtzeit-Kalender, Onlinezahlung und automatischen Bestätigungen. Schritt für Schritt eingerichtet – ohne eigene Website programmieren zu müssen.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <ButtonLink href="/registrieren" size="lg">{env.TRIAL_DAYS > 0 ? `${env.TRIAL_DAYS} Tage kostenlos testen` : "Jetzt starten"} <ArrowRight /></ButtonLink>
-              <ButtonLink href="/so-funktionierts" size="lg" variant="secondary">So funktioniert&apos;s</ButtonLink>
+              <ButtonLink href="/demo" size="lg" variant="secondary">Demo ausprobieren</ButtonLink>
             </div>
             <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-600">
               {["Ab CHF 39.– pro Monat", "Monatlich kündbar", "Keine Provision auf Buchungen"].map((x) => <li key={x} className="flex items-center gap-1.5"><Check className="size-4 text-brand-600" />{x}</li>)}
@@ -104,6 +104,13 @@ export default async function Home() {
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
             {SOLUTIONS.map((s) => <Link key={s.slug} href={`/loesungen/${s.slug}`} className="shrink-0 rounded-full bg-white px-4 py-1.5 text-sm font-medium text-ink-700 ring-1 ring-ink-200 transition hover:text-brand-800 hover:ring-brand-300">{s.name}</Link>)}
           </div>
+        </div>
+      </section>
+
+      <section className="container-page py-12 sm:py-16">
+        <div className="grid overflow-hidden rounded-3xl bg-brand-900 text-white lg:grid-cols-2">
+          <div className="p-7 sm:p-10"><p className="text-sm font-medium text-brand-200">In 48 Sekunden erklärt</p><h2 className="mt-3 text-3xl font-semibold">Vom freien Raum zur übersichtlichen Buchung.</h2><p className="mt-4 leading-relaxed text-brand-100">Sehen Sie, wie Gäste einen Termin auswählen und wie Sie Buchungen im Blick behalten. Mit einem Beispiel statt langer Erklärungen.</p><Link href="/so-funktionierts#video" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-brand-900 hover:bg-brand-50">Erklärvideo ansehen <ArrowRight className="size-4" /></Link></div>
+          <Link href="/so-funktionierts#video" className="relative block min-h-56 bg-brand-50" aria-label="Erklärvideo: Raumvia in 48 Sekunden"><img src="/media/raumvia-erklaervideo-poster.jpg" width="1280" height="720" loading="lazy" alt="Vorschau des Raumvia-Erklärvideos" className="h-full w-full object-contain" /></Link>
         </div>
       </section>
 

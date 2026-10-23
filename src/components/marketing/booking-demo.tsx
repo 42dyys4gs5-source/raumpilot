@@ -1,0 +1,39 @@
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { ArrowRight, Check, RotateCcw } from "lucide-react";
+const DAYS = ["Freitag, 12. Juni", "Samstag, 13. Juni", "Sonntag, 14. Juni"];
+const field = "mt-2 w-full rounded-xl border border-ink-200 bg-white p-3 text-ink-900 focus-visible:outline-2 focus-visible:outline-brand-700";
+export function BookingDemo() {
+  const [day, setDay] = useState(DAYS[1]);
+  const [hours, setHours] = useState(2);
+  const [start, setStart] = useState(14);
+  const [beamer, setBeamer] = useState(true);
+  const [booked, setBooked] = useState(false);
+  const [view, setView] = useState<"guest" | "owner">("guest");
+  const total = hours * 60 + (beamer ? 20 : 0);
+  function reset() { setDay(DAYS[1]); setHours(2); setStart(14); setBeamer(true); setBooked(false); setView("guest"); }
+  return <div className="mx-auto max-w-5xl">
+    <p className="mb-6 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-900"><strong>Alles hier ist ein Beispiel.</strong> Fiktive Termine und Preise, keine echte Buchung oder Zahlung. Ihre Auswahl bleibt nur in dieser geöffneten Demo.</p>
+    <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Demo-Perspektive">
+      <button type="button" aria-pressed={view === "guest"} onClick={() => setView("guest")} className={`rounded-full px-5 py-3 font-medium ${view === "guest" ? "bg-brand-800 text-white" : "bg-ink-100 text-ink-700"}`}>Als Gast ausprobieren</button>
+      <button type="button" aria-pressed={view === "owner"} onClick={() => setView("owner")} className={`rounded-full px-5 py-3 font-medium ${view === "owner" ? "bg-brand-800 text-white" : "bg-ink-100 text-ink-700"}`}>Vermieteransicht</button>
+    </div>
+    {view === "guest" ? <div className="grid overflow-hidden rounded-3xl border border-ink-200 bg-white shadow-soft lg:grid-cols-2">
+      <div><div className="relative aspect-[4/3]"><Image src="/media/raum-am-park.webp" alt="Fiktiver Raum am Park: helle Holztische und grüne Stühle" fill sizes="(min-width: 1024px) 50vw, 100vw" priority className="object-cover" /></div><div className="p-6 sm:p-8"><p className="eyebrow">Fiktiver Beispielraum</p><h2 className="mt-2 text-2xl font-semibold">Raum am Park</h2><p className="mt-3 text-ink-600">Ein heller Ort für Workshops, Vereinsabende und kleine Feiern. In der Demo sehen Sie beispielhaft, wie Ihre eigene Buchungsseite funktionieren kann.</p><ul className="mt-5 flex flex-wrap gap-2 text-sm">{["Bis 24 Personen", "WLAN", "Beamer optional"].map(x => <li key={x} className="rounded-full bg-ink-50 px-3 py-2">{x}</li>)}</ul><p className="mt-5 text-xs text-ink-500">KI-generiertes Raumbild · kein reales Mietangebot</p></div></div>
+      <div className="border-t border-ink-100 p-6 sm:p-8 lg:border-l lg:border-t-0">
+        {booked ? <div role="status" className="py-4"><Check className="size-12 rounded-full bg-brand-50 p-3 text-brand-700" /><h2 className="mt-4 text-2xl font-semibold">Demo-Buchung bestätigt</h2><p className="mt-3 text-ink-600">{day}, {start}:00–{start + hours}:00 Uhr</p><p className="mt-2 font-semibold">Beispieltotal: CHF {total}.–</p><p className="mt-4 text-sm text-ink-500">Es wurde nichts reserviert, nichts abgebucht und keine E-Mail versendet.</p><button type="button" onClick={() => setView("owner")} className="mt-6 w-full rounded-xl bg-brand-700 p-3 font-semibold text-white">In der Vermieteransicht ansehen</button></div> : <form onSubmit={e => { e.preventDefault(); setBooked(true); }}>
+          <h2 className="text-xl font-semibold">Ihren Beispieltermin wählen</h2>
+          <label className="mt-5 block text-sm font-medium">Beispieltag<select value={day} onChange={e => setDay(e.target.value)} className={field}>{DAYS.map(d => <option key={d}>{d}</option>)}</select></label>
+          <div className="mt-4 grid grid-cols-2 gap-4"><label className="text-sm font-medium">Dauer<select value={hours} onChange={e => setHours(Number(e.target.value))} className={field}>{[1,2,3,4].map(n => <option key={n} value={n}>{n} {n === 1 ? "Stunde" : "Stunden"}</option>)}</select></label><label className="text-sm font-medium">Startzeit<select value={start} onChange={e => setStart(Number(e.target.value))} className={field}>{[10,14,18].map(n => <option key={n} value={n}>{n}:00 Uhr</option>)}</select></label></div>
+          <label className="mt-5 flex cursor-pointer items-center gap-3 rounded-xl border border-ink-200 p-4 text-sm"><input type="checkbox" checked={beamer} onChange={e => setBeamer(e.target.checked)} className="size-5 accent-brand-700" />Beamer dazubuchen · CHF 20.–</label>
+          <div className="mt-5 space-y-2 rounded-xl bg-ink-50 p-4 text-sm" aria-live="polite" aria-atomic="true"><p className="flex justify-between gap-2"><span>{hours} Std. × CHF 60.–</span><span>CHF {hours * 60}.–</span></p>{beamer && <p className="flex justify-between"><span>Beamer</span><span>CHF 20.–</span></p>}<p className="flex justify-between border-t border-ink-200 pt-3 text-lg font-semibold"><span>Beispieltotal</span><output data-testid="demo-total">CHF {total}.–</output></p></div>
+          <button type="submit" className="mt-5 w-full rounded-xl bg-brand-700 px-4 py-3 font-semibold text-white hover:bg-brand-800">Demo-Buchung simulieren</button><p className="mt-3 text-center text-xs text-ink-500">Ohne Anmeldung · ohne Zahlungsdaten</p>
+        </form>}
+      </div>
+    </div> : <section className="rounded-3xl border border-ink-200 bg-white p-6 shadow-soft sm:p-9"><p className="eyebrow">Vereinfachte Vermieteransicht</p><h2 className="mt-3 text-2xl font-semibold">Ihre Buchungen auf einen Blick</h2><p className="mt-3 text-ink-600">In Raumvia verwalten Sie Buchungen, Anfragen und Termine. Hier sehen Sie Ihre simulierte Buchung als Beispiel.</p>{booked ? <article className="mt-6 rounded-2xl border border-brand-200 bg-brand-50 p-5"><span className="text-sm font-semibold text-brand-800">Bestätigt · Demo</span><h3 className="mt-2 text-xl font-semibold">Raum am Park</h3><dl className="mt-4 grid gap-4 sm:grid-cols-3"><div><dt className="text-sm text-ink-500">Termin</dt><dd>{day}<br />{start}:00–{start + hours}:00 Uhr</dd></div><div><dt className="text-sm text-ink-500">Zusatzleistung</dt><dd>{beamer ? "Beamer" : "Keine"}</dd></div><div><dt className="text-sm text-ink-500">Beispieltotal</dt><dd className="font-semibold">CHF {total}.–</dd></div></dl></article> : <p className="mt-6 rounded-xl bg-ink-50 p-6 text-ink-600">Noch keine Demo-Buchung. Wechseln Sie zur Gastansicht und simulieren Sie Ihren ersten Termin.</p>}<button type="button" onClick={() => setView("guest")} className="mt-5 font-semibold text-brand-700 underline underline-offset-4">Zur Gastansicht</button></section>}
+    <div className="mt-5 flex justify-end"><button type="button" onClick={reset} className="inline-flex items-center gap-2 px-3 py-2 text-sm text-ink-600 hover:text-brand-700"><RotateCcw className="size-4" />Demo zurücksetzen</button></div>
+    <div className="mt-10 rounded-3xl bg-brand-900 p-7 text-white sm:p-9"><h2 className="text-2xl font-semibold">Jetzt Ihren eigenen Raum online bringen.</h2><p className="mt-3 max-w-2xl text-brand-100">Ihre Fotos, Ihre Preise, Ihre Regeln. Starten Sie die Einrichtung oder vergleichen Sie zuerst die Tarife.</p><div className="mt-6 flex flex-wrap gap-4"><Link href="/registrieren" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-brand-900">Eigenen Raum einrichten <ArrowRight className="size-4" /></Link><Link href="/preise" className="rounded-xl border border-brand-500 px-5 py-3 font-medium">Tarife ansehen</Link></div></div>
+  </div>;
+}

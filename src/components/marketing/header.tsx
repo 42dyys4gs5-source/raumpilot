@@ -24,7 +24,7 @@ const LINKS = [
   { href: "/preise", label: "Preise" },
   { href: "/so-funktionierts", label: "So funktioniert's" },
   { href: "/ratgeber", label: "Ratgeber" },
-  { href: "/faq", label: "FAQ" },
+  { href: "/demo", label: "Demo" },
 ];
 
 export function MarketingHeader({ loggedIn }: { loggedIn: boolean }) {

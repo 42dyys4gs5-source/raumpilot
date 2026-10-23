@@ -1,0 +1,26 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:08.000
+Raumvia: Raumvermietung einfach online organisieren. Freie Zeiten zeigen, Buchungen verwalten und Rückfragen reduzieren.
+
+2
+00:00:08.000 --> 00:00:16.000
+Beispiel Raum am Park: Mietende wählen Datum, Dauer und eine freie Startzeit. Alle dargestellten Daten sind fiktiv.
+
+3
+00:00:16.000 --> 00:00:24.000
+Beispielpreis: zwei Stunden CHF 120 und Beamer CHF 20 ergeben CHF 140. Vermietende wählen Sofortbuchung oder Anfrage mit Freigabe.
+
+4
+00:00:24.000 --> 00:00:32.000
+Vermietende behalten Buchungen und Anfragen im Kalender und in der Übersicht im Blick. Bestätigungen werden per E-Mail verschickt.
+
+5
+00:00:32.000 --> 00:00:40.000
+Die Buchungsseite lässt sich per Link, QR-Code oder Website-Widget teilen. Onlinezahlung ist optional über das eigene Stripe-Konto möglich. TWINT hängt vom Konto ab; Stripe-Gebühren können anfallen. Alternativ: Rechnung oder Zahlung vor Ort.
+
+6
+00:00:40.000 --> 00:00:48.000
+Probieren Sie die Demo auf raumvia.ch/demo aus. Ohne Anmeldung und ohne echte Buchung. Danach können Sie Ihren eigenen Raum einrichten.
+

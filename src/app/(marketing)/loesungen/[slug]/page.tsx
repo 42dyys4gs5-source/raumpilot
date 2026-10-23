@@ -1,6 +1,7 @@
 import { ArrowRight, Check, X } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ButtonLink } from "@/components/ui/button";
 import { ContentBlocks } from "@/components/marketing/content-blocks";
@@ -35,6 +36,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       <PageHero eyebrow={`Lösung für ${s.name}`} title={s.headline} intro={s.intro}>
         <div className="mt-8 flex flex-wrap gap-3"><ButtonLink href="/registrieren" size="lg">Kostenlos testen <ArrowRight /></ButtonLink><ButtonLink href="/preise" size="lg" variant="secondary">Preise</ButtonLink></div>
       </PageHero>
+      {["eventraeume", "partyraeume", "gemeinschaftsraeume", "sitzungszimmer", "seminarraeume"].includes(s.slug) && <figure className="container-page pt-8"><div className="relative aspect-[16/9] max-h-[440px] overflow-hidden rounded-3xl"><Image src={["sitzungszimmer", "seminarraeume"].includes(s.slug) ? "/media/workshop-studio.webp" : "/media/raum-am-park.webp"} alt={"Illustration: einladender Raum für " + s.name} fill sizes="(min-width: 1280px) 1200px, 100vw" className="object-cover" /></div><figcaption className="mt-3 text-xs text-ink-500">Fiktiver Beispielraum · KI-generiertes Bild. <Link href="/demo" className="text-brand-700 underline">Buchungsablauf ausprobieren</Link></figcaption></figure>}
       <section className="py-16">
         <div className="container-page grid gap-10 lg:grid-cols-[1fr_1.4fr]">
           <div className="rounded-2xl bg-ink-50 p-6">
