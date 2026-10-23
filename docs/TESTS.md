@@ -62,9 +62,12 @@ Bekannt: `npm audit` meldet PostCSS innerhalb von Next.js 15 (nur Build-Zeit, ke
 | ESLint (`npm run lint`) | bestanden |
 | Unit-Tests | **39 / 39 bestanden** |
 | Produktions-Build (`npm run build`) | erfolgreich |
-| Playwright: Rechnerseite und CHF-Berechnung | **2 / 2 bestanden** |
+| Produktions-Abhängigkeiten (`npm audit --omit=dev`) | **0 bekannte Schwachstellen** nach Next.js-/PostCSS-Patches |
+| Playwright: Rechnerseite, CHF-Berechnung und Tastaturbedienung | **3 / 3 bestanden** |
 | Desktop- und 390px-Mobile-Ansicht | HTTP 200, kein horizontaler Überlauf, keine Browserfehler |
 | Integrationstests | nicht ausführbar: PostgreSQL auf `localhost:5432` nicht erreichbar (`ECONNREFUSED`) |
 | vollständige Playwright-Suite | nicht ausführbar: E2E-Datenbank auf `localhost:5432` nicht erreichbar |
 
 Die neuen Registrierungs-, Vorschau- und Funnel-Integrationstests brauchen die E2E-PostgreSQL-Datenbank. Sie wurden in dieser Umgebung nicht ausgeführt. Der gezielte Rechner-E2E-Test lief ohne Datenbank gegen den Produktions-Build.
+
+`npm audit` über alle Entwicklungsabhängigkeiten meldet weiterhin sieben Advisories in Test-/Build-Werkzeugen (fünf moderate, zwei kritische); die vorgeschlagenen automatischen Fixes würden Vitest bzw. Drizzle Kit auf inkompatible Major-Versionen setzen. Die Produktions-Abhängigkeiten sind separat geprüft und weisen keine bekannten Advisories aus.

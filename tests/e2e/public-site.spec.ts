@@ -37,6 +37,15 @@ test("Umsatzrechner zeigt nachvollziehbare CHF-Schätzungen", async ({ page }) =
   await expect(page.getByText(/keine Umsatzgarantie/)).toBeVisible();
 });
 
+test("Umsatzrechner lässt sich mit der Tastatur bedienen", async ({ page }) => {
+  await page.goto("/tools/raum-umsatzrechner");
+  const occupancy = page.getByRole("slider", { name: /Erwartete Auslastung/ });
+  await occupancy.focus();
+  await occupancy.press("End");
+  await expect(page.getByText(/Erwartete Auslastung: 100%/)).toBeVisible();
+  await expect(page.getByText("CHF 6’933.– / Monat").first()).toBeVisible();
+});
+
 test("Kontaktformular erstellt eine Anfrage", async ({ page }) => {
   await page.goto("/kontakt");
   await page.getByLabel("Name").fill("Interessentin");
