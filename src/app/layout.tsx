@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
 import { BRAND } from "@/config/brand";
 import { env } from "@/lib/env";
 import "./globals.css";
@@ -33,7 +34,11 @@ export const viewport: Viewport = { themeColor: BRAND.primary, width: "device-wi
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de-CH" className={`${inter.variable} ${jakarta.variable}`}>
-      <body className="min-h-dvh font-sans">{children}</body>
+      <body className="min-h-dvh font-sans">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
+
