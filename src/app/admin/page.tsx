@@ -48,6 +48,26 @@ export default async function AdminHome() {
           </CardBody>
         </Card>
       </div>
+      <Card className="mt-6">
+        <CardHeader title="Aktivierungs-Funnel (letzte 30 Tage)" />
+        <CardBody>
+          {(() => {
+            const labels: Record<string, string> = {
+              "funnel.registration_started": "Registrierung gestartet",
+              "user.registered": "Registrierung abgeschlossen",
+              "funnel.first_room_created": "Erster Raum erstellt",
+              "funnel.private_preview_viewed": "Private Vorschau angesehen",
+              "funnel.plan_selection_opened": "Tarifauswahl geöffnet",
+              "billing.checkout_started": "Checkout gestartet",
+              "funnel.subscription_activated": "Abo aktiviert",
+              "funnel.first_room_published": "Erster Raum veröffentlicht",
+            };
+            const values = new Map(m.funnel.map((item) => [item.action, item.organisations]));
+            return <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{Object.entries(labels).map(([action, label]) => <li key={action} className="flex items-center justify-between gap-3 rounded-xl bg-ink-50 px-4 py-3 text-sm"><span>{label}</span><strong className="tabular-nums text-brand-800">{values.get(action) ?? 0}</strong></li>)}</ol>;
+          })()}
+          <p className="mt-3 text-xs text-ink-500">Registrierungsstarts werden mit zufälliger Sitzungs-ID dedupliziert; übrige Schritte zählen Organisationen. Keine IP- oder User-Agent-Daten für diese Auswertung.</p>
+        </CardBody>
+      </Card>
     </>
   );
 }

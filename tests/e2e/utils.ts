@@ -32,9 +32,6 @@ export async function register(page: Page, o: { email: string; company: string; 
   await page.getByLabel("Firma / Angebotsname").fill(o.company);
   await page.getByLabel("E-Mail-Adresse").fill(o.email);
   await page.getByLabel("Passwort", { exact: true }).fill("Sicher-Test-2026");
-  await page.getByLabel("Strasse und Nr.").fill("Seestrasse 1");
-  await page.getByLabel("PLZ", { exact: true }).fill("8002");
-  await page.getByLabel("Ort", { exact: true }).fill("Zürich");
   await page.waitForTimeout(1600); // anti-bot minimum fill time
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Konto erstellen" }).click();
@@ -57,6 +54,7 @@ export async function setupLandlord(page: Page, o: { email: string; company: str
   await register(page, { email: o.email, company: o.company });
   await page.getByRole("button", { name: "Weiter" }).click();
   await page.getByLabel("Name des Raums").fill(o.room);
+  await page.getByLabel("Ort", { exact: true }).fill("Zürich");
   await page.getByLabel("Preis pro Stunde (CHF)").fill("60");
   await page.getByRole("button", { name: "Raum erstellen" }).click();
   await expect(page.getByRole("heading", { name: "Wählen Sie Ihren Tarif" })).toBeVisible();

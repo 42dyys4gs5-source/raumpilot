@@ -19,6 +19,8 @@ test("Datenisolation: Vermieter B sieht keine Buchungen und Räume von Vermieter
   await register(page, { email: a, company: `Firma A ${uid()}` });
   await page.getByRole("button", { name: "Weiter" }).click();
   await page.getByLabel("Name des Raums").fill("Geheimer Raum");
+  await page.getByLabel("Ort", { exact: true }).fill("Bern");
+  await page.getByLabel("Preis pro Stunde (CHF)").fill("75");
   await page.getByRole("button", { name: "Raum erstellen" }).click();
   await expect(page.getByRole("heading", { name: "Wählen Sie Ihren Tarif" })).toBeVisible();
   const [room] = await db<{ id: string }[]>`SELECT r.id FROM rooms r JOIN organizations o ON o.id = r.org_id WHERE o.contact_email = ${a}`;

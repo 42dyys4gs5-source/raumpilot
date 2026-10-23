@@ -75,7 +75,7 @@ export function MarketingHeader({ loggedIn }: { loggedIn: boolean }) {
         </button>
       </div>
       {open && (
-        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-ink-200 bg-white lg:hidden">
+        <div className="max-h-[calc(100dvh-4rem)] animate-fade-up overflow-y-auto overscroll-contain border-t border-ink-200 bg-white lg:hidden">
           <nav className="container-page space-y-1 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]" aria-label="Mobile Navigation">
             <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Lösungen</p>
             {SOLUTIONS.map(([slug, label]) => <Link key={slug} href={`/loesungen/${slug}`} className="block rounded-lg px-3 py-2.5 text-ink-700 hover:bg-ink-50">{label}</Link>)}

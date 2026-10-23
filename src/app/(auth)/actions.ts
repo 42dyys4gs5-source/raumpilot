@@ -43,12 +43,6 @@ const registerSchema = z.object({
   name: z.string().min(2, "Bitte geben Sie Ihren Namen an.").max(100),
   company: z.string().min(2, "Bitte geben Sie Ihre Firma oder den Namen Ihres Angebots an.").max(120),
   email: z.string().email("Bitte geben Sie eine gültige E-Mail-Adresse an.").max(200),
-  phone: z.string().max(40).optional(),
-  street: z.string().min(2, "Bitte geben Sie Strasse und Nummer an.").max(120),
-  postalCode: z.string().min(3, "PLZ fehlt.").max(12),
-  city: z.string().min(2, "Ort fehlt.").max(80),
-  country: z.enum(["CH", "LI", "DE", "AT", "FR", "IT"]),
-  vatNumber: z.string().max(40).optional(),
   plan: z.enum(["starter", "professional", "business"]).optional(),
 });
 
@@ -62,12 +56,6 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
     name: str(fd, "name"),
     company: str(fd, "company"),
     email: str(fd, "email").toLowerCase(),
-    phone: str(fd, "phone") || undefined,
-    street: str(fd, "street"),
-    postalCode: str(fd, "postalCode"),
-    city: str(fd, "city"),
-    country: str(fd, "country") || "CH",
-    vatNumber: str(fd, "vatNumber") || undefined,
     plan: (str(fd, "plan") || undefined) as never,
   });
   if (!parsed.success) {
@@ -90,8 +78,8 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
   const passwordHash = await hashPassword(password);
   const slug = await uniqueOrgSlug(d.company);
   const referrer = await findReferrer(str(fd, "ref"));
-  const userId = await db.transaction(async (tx) => {
-    const [user] = await tx.insert(schema.users).values({ email: d.email, name: d.name, phone: d.phone ?? null, passwordHash }).returning();
+  const account = await db.transaction(async (tx) => {
+    const [user] = await tx.insert(schema.users).values({ email: d.email, name: d.name, passwordHash }).returning();
     const [org] = await tx
       .insert(schema.organizations)
       .values({
@@ -99,13 +87,6 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
         slug,
         legalName: d.company,
         contactEmail: d.email,
-        phone: d.phone ?? null,
-        street: d.street,
-        postalCode: d.postalCode,
-        city: d.city,
-        country: d.country,
-        vatNumber: d.vatNumber ?? null,
-        vatRegistered: !!d.vatNumber,
         planKey: null,
         referredByOrgId: referrer?.id ?? null,
       })
@@ -114,11 +95,11 @@ export async function registerAction(_: ActionState, fd: FormData): Promise<Acti
     for (const step of WELCOME_STEPS) {
       await enqueue(tx, "welcome.step", { userId: user.id, step }, { runAt: new Date(Date.now() + step * 86400_000 + (step === 0 ? 5 * 60_000 : 0)), dedupeKey: `welcome:${user.id}:${step}` });
     }
-    return user.id;
+    return { userId: user.id, orgId: org.id };
   });
-  await sendVerification(userId, d.name, d.email);
-  await audit("user.registered", { userId, data: { plan: d.plan ?? null, referredBy: referrer?.id ?? null } });
-  await createSession(userId);
+  await sendVerification(account.userId, d.name, d.email);
+  await audit("user.registered", { userId: account.userId, orgId: account.orgId, data: { plan: d.plan ?? null, referredBy: referrer?.id ?? null } });
+  await createSession(account.userId);
   kickJobs();
   redirect(`/email-bestaetigen${d.plan ? `?tarif=${d.plan}` : ""}`);
 }
