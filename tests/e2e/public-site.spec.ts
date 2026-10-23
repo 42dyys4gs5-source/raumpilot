@@ -31,6 +31,7 @@ test("Umsatzrechner zeigt nachvollziehbare CHF-Schätzungen", async ({ page }) =
   await page.getByLabel("Mietpreis pro Stunde (CHF)").fill("100");
   await page.getByLabel("Buchbare Stunden pro Woche").fill("10");
   await page.getByLabel(/Erwartete Auslastung/).fill("50");
+  await page.getByText("Betriebskosten einrechnen").click();
   await page.getByLabel(/Monatliche Betriebskosten/).fill("500");
   await expect(page.getByText("CHF 2’166.67", { exact: true })).toBeVisible();
   await expect(page.getByText("CHF 1’666.67", { exact: true })).toBeVisible();
@@ -42,7 +43,8 @@ test("Umsatzrechner lässt sich mit der Tastatur bedienen", async ({ page }) => 
   const occupancy = page.getByRole("slider", { name: /Erwartete Auslastung/ });
   await occupancy.focus();
   await occupancy.press("End");
-  await expect(page.getByText(/Erwartete Auslastung: 100%/)).toBeVisible();
+  await expect(occupancy).toHaveValue("100");
+  await expect(page.locator('output[for="occupancy"]')).toHaveText("100%");
   await expect(page.getByText("CHF 6’933.33", { exact: true })).toBeVisible();
 });
 
