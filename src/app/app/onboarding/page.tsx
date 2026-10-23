@@ -29,6 +29,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const sp = await searchParams;
   let step = Number(sp.schritt ?? 0) || (!ctx ? 1 : rooms.length === 0 ? 1 : !ctx.plan ? 3 : 4);
   if (step > 1 && !ctx) step = 1;
+  step = Math.max(1, Math.min(STEPS.length, step));
   if (step === 3 && ctx) await recordFunnelEvent("funnel.plan_selection_opened", ctx.org.id);
   const [plans, note] = await Promise.all([listPlans(), vatNote()]);
 
@@ -41,14 +42,17 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         </div>
       </header>
       <main className="container-page max-w-4xl py-8">
-        <ol className="mb-8 grid grid-cols-4 gap-2" aria-label="Fortschritt">
+        <ol className="mb-8 grid grid-cols-4 gap-2" aria-label={`Fortschritt: Schritt ${step} von ${STEPS.length}`}>
           {STEPS.map((s, i) => (
             <li key={s} className="text-center">
-              <div className={cn("mx-auto h-1.5 rounded-full", i + 1 <= step ? "bg-brand-600" : "bg-ink-200")} />
-              <span className={cn("mt-2 block text-xs sm:text-sm", i + 1 === step ? "font-semibold text-ink-900" : "text-ink-500")} aria-current={i + 1 === step ? "step" : undefined}>{s}</span>
+              <div className={cn("h-1.5 overflow-hidden rounded-full bg-ink-200", i + 1 <= step && "bg-brand-100")}>
+                <div className={cn("h-full rounded-full transition-[width] duration-500 ease-out", i + 1 < step ? "w-full bg-brand-600" : i + 1 === step ? "w-2/3 bg-brand-600" : "w-0")} />
+              </div>
+              <span className={cn("mt-2 hidden text-xs sm:block", i + 1 === step ? "font-semibold text-brand-800" : "text-ink-400")} aria-current={i + 1 === step ? "step" : undefined}>{s}</span>
             </li>
           ))}
         </ol>
+        <p className="mb-5 text-sm font-medium text-ink-600 sm:hidden">Schritt {step} von {STEPS.length} <span aria-hidden="true" className="mx-1 text-ink-300">·</span><span className="text-ink-900">{STEPS[step - 1]}</span></p>
 
         {step === 1 && (
           <Card>

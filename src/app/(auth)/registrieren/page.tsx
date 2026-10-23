@@ -20,10 +20,10 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <RegistrationStartedTracker />
-      <h1 className="text-2xl font-semibold">Konto erstellen</h1>
-      <p className="mt-1 text-sm text-ink-500">
-        {env.TRIAL_DAYS > 0 ? `${env.TRIAL_DAYS} Tage kostenlos testen. ` : ""}Bereits registriert?{" "}
-        <Link href="/login" className="font-medium text-brand-700 hover:underline">Anmelden</Link>
+      <h1 className="text-2xl font-semibold sm:text-3xl">Schön, dass Sie starten.</h1>
+      <p className="mt-2 text-sm leading-relaxed text-ink-600">
+        {env.TRIAL_DAYS > 0 ? `${env.TRIAL_DAYS} Tage kostenlos testen. ` : ""}Erstellen Sie Ihr Konto und richten Sie danach Ihren ersten Raum ein. Bereits registriert?{" "}
+        <Link href="/login" className="font-semibold text-brand-700 underline-offset-4 hover:underline">Anmelden</Link>
       </p>
       {referrer && (
         <Alert tone="success" className="mt-4" title={`Empfohlen von ${referrer.name}`}>
@@ -52,7 +52,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           <Input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
           <FieldError name="password" />
         </Field>
-        <p className="rounded-xl bg-ink-50 p-4 text-sm leading-relaxed text-ink-600">Rechnungsadresse und MWST-Angaben benötigen wir erst, wenn Sie einen kostenpflichtigen Tarif auswählen. Sie können Ihren Raum vorher einrichten und privat ansehen.</p>
+        <p className="rounded-2xl border border-brand-100 bg-brand-50/70 p-4 text-sm leading-relaxed text-brand-900"><strong className="font-semibold">Erst einrichten, dann entscheiden.</strong><br />Rechnungsadresse und MWST-Angaben brauchen wir erst bei der Tarifwahl. Ihren Raum können Sie vorher privat ansehen.</p>
         <Checkbox
           name="terms"
           required

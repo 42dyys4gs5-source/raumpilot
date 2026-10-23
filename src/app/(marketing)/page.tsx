@@ -79,17 +79,18 @@ export default async function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_70%_0%,var(--color-brand-100),transparent_70%)]" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-24 -z-10 size-72 animate-pulse-glow rounded-full bg-accent-100/70 blur-3xl sm:size-96" />
         <div className="container-page grid items-center gap-12 pb-16 pt-10 sm:gap-14 sm:pb-20 sm:pt-12 lg:grid-cols-[1.2fr_1fr] lg:pb-28 lg:pt-20">
           <div className="animate-fade-up">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-brand-800 shadow-soft ring-1 ring-brand-200/70 backdrop-blur sm:text-sm"><Sparkles className="size-4 shrink-0 text-accent-500" /> Buchungssoftware für Raumvermieter in der Schweiz</p>
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-brand-800 shadow-soft ring-1 ring-brand-200/70 backdrop-blur sm:text-sm"><Sparkles className="size-4 shrink-0 text-accent-500" /> Für Raumvermieter in der Schweiz</p>
             <h1 className="mt-6 text-[2.5rem] font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.25rem]">Ihr Raum.<br />Online buchbar.<br /><span className="text-brand-700 xl:whitespace-nowrap">Ohne Telefon-Pingpong.</span></h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-600">Raumvia gibt Ihrem Event-, Party-, Seminar- oder Proberaum eine eigene Buchungsseite mit Echtzeit-Kalender, Onlinezahlung und automatischen Bestätigungen. Schritt für Schritt eingerichtet – ohne eigene Website programmieren zu müssen.</p>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-600">Eigene Buchungsseite, freie Termine, Zahlung und Bestätigungen – für Eventräume, Studios und Sitzungszimmer. Einfach einrichten, auch ohne eigene Website.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <ButtonLink href="/registrieren" size="lg">{env.TRIAL_DAYS > 0 ? `${env.TRIAL_DAYS} Tage kostenlos testen` : "Jetzt starten"} <ArrowRight /></ButtonLink>
+              <ButtonLink href="/registrieren" size="lg" className="group">{env.TRIAL_DAYS > 0 ? `${env.TRIAL_DAYS} Tage kostenlos testen` : "Jetzt starten"} <ArrowRight className="transition-transform group-hover:translate-x-1" /></ButtonLink>
               <ButtonLink href="/demo" size="lg" variant="secondary">Demo ausprobieren</ButtonLink>
             </div>
             <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-600">
-              {["Ab CHF 39.– pro Monat", "Monatlich kündbar", "Keine Provision auf Buchungen"].map((x) => <li key={x} className="flex items-center gap-1.5"><Check className="size-4 text-brand-600" />{x}</li>)}
+              {["Ab CHF 39.– pro Monat", "Monatlich kündbar", "Keine Provision"].map((x) => <li key={x} className="flex items-center gap-1.5"><Check className="size-4 text-brand-600" />{x}</li>)}
             </ul>
           </div>
           <ProductPreview />
@@ -102,7 +103,7 @@ export default async function Home() {
           <span className="text-sm text-ink-500 sm:mr-2">Gemacht für</span>
           {/* Mobile: one swipeable row instead of four wrapped lines */}
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
-            {SOLUTIONS.map((s) => <Link key={s.slug} href={`/loesungen/${s.slug}`} className="shrink-0 rounded-full bg-white px-4 py-1.5 text-sm font-medium text-ink-700 ring-1 ring-ink-200 transition hover:text-brand-800 hover:ring-brand-300">{s.name}</Link>)}
+            {SOLUTIONS.map((s) => <Link key={s.slug} href={`/loesungen/${s.slug}`} className="shrink-0 rounded-full bg-white px-4 py-1.5 text-sm font-medium text-ink-700 ring-1 ring-ink-200 transition duration-200 hover:-translate-y-0.5 hover:text-brand-800 hover:ring-brand-300 hover:shadow-soft">{s.name}</Link>)}
           </div>
         </div>
       </section>
@@ -148,9 +149,9 @@ export default async function Home() {
             <p className="mt-4 text-lg leading-relaxed text-ink-600">Keine überladene Hotelsoftware, sondern genau die Funktionen für stunden- und tageweise Raumvermietung.</p>
           </div>
           <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="flex gap-4 rounded-2xl border border-ink-200/80 bg-white p-5 shadow-soft transition duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-lift sm:block sm:p-6">
-                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700 ring-1 ring-brand-100"><f.icon className="size-5" /></div>
+            {FEATURES.map((f, i) => (
+              <div key={f.title} style={{ animationDelay: `${Math.min(45 * i, 315)}ms` }} className="group/feature animate-rise-in flex gap-4 rounded-2xl border border-ink-200/80 bg-white p-5 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lift sm:block sm:p-6">
+                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700 ring-1 ring-brand-100 transition duration-300 group-hover/feature:scale-105 group-hover/feature:bg-brand-100"><f.icon className="size-5" /></div>
                 <div>
                   <h3 className="font-semibold sm:mt-4">{f.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-600 sm:mt-2">{f.text}</p>
@@ -173,8 +174,8 @@ export default async function Home() {
               ["Link teilen", "Buchungslink auf Website, Google, Instagram oder als QR-Code vor Ort teilen."],
               ["Buchungen erhalten", "Kunden buchen und bezahlen selbst. Sie sehen alles im Dashboard und Kalender."],
             ].map(([t, x], i) => (
-              <li key={t} className="relative flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 md:block md:p-6 md:text-center">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-base font-semibold text-white shadow-sm ring-4 ring-brand-50 md:mx-auto">{i + 1}</span>
+              <li key={t} style={{ animationDelay: `${i * 100}ms` }} className="animate-rise-in relative flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-soft md:block md:p-6 md:text-center">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-base font-semibold text-white shadow-sm ring-4 ring-brand-50 transition-transform duration-300 md:mx-auto md:hover:scale-105">{i + 1}</span>
                 <div>
                   <h3 className="text-lg font-semibold md:mt-4">{t}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-600 md:mt-2">{x}</p>

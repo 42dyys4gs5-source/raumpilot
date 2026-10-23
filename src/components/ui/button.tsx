@@ -4,13 +4,13 @@ import * as React from "react";
 import { cn } from "@/lib/utils/cn";
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:scale-[0.98] [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-200 ease-out disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:scale-[0.98] [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-brand-700 text-white shadow-sm hover:bg-brand-800",
-        accent: "bg-accent-500 text-ink-900 shadow-sm hover:bg-accent-400",
-        secondary: "bg-white text-ink-800 ring-1 ring-ink-200 ring-inset shadow-sm hover:bg-ink-50",
+        primary: "bg-brand-700 text-white shadow-sm hover:-translate-y-0.5 hover:bg-brand-800 hover:shadow-soft",
+        accent: "bg-accent-500 text-ink-900 shadow-sm hover:-translate-y-0.5 hover:bg-accent-400 hover:shadow-soft",
+        secondary: "bg-white text-ink-800 ring-1 ring-ink-200 ring-inset shadow-sm hover:-translate-y-0.5 hover:bg-ink-50 hover:shadow-soft",
         ghost: "text-ink-700 hover:bg-ink-100",
         danger: "bg-red-600 text-white shadow-sm hover:bg-red-700",
         "danger-ghost": "text-red-700 hover:bg-red-50",
