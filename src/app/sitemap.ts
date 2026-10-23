@@ -12,10 +12,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/ratgeber", "/registrieren"].map((p) => ({
+  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/demo", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/ratgeber", "/registrieren"].map((p) => ({
     url: appUrl(p),
-    lastModified: now,
     changeFrequency: "weekly" as const,
     priority: p === "/" ? 1 : 0.7,
   }));
@@ -37,11 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   return [
     ...statics,
-    ...SOLUTIONS.map((s) => ({ url: appUrl(`/loesungen/${s.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
+    ...SOLUTIONS.map((s) => ({ url: appUrl(`/loesungen/${s.slug}`), changeFrequency: "monthly" as const, priority: 0.8 })),
     ...GUIDES.map((g) => ({ url: appUrl(`/ratgeber/${g.slug}`), lastModified: new Date(g.updated), changeFrequency: "monthly" as const, priority: 0.7 })),
-    ...HELP_ARTICLES.map((a) => ({ url: appUrl(`/hilfe/${a.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
-    ...LEGAL_DOCS.map((d) => ({ url: appUrl(`/rechtliches/${d.slug}`), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
+    ...HELP_ARTICLES.map((a) => ({ url: appUrl(`/hilfe/${a.slug}`), changeFrequency: "monthly" as const, priority: 0.5 })),
+    ...LEGAL_DOCS.map((d) => ({ url: appUrl(`/rechtliches/${d.slug}`), changeFrequency: "yearly" as const, priority: 0.2 })),
     ...rooms.map((r) => ({ url: appUrl(`/r/${r.slug}`), lastModified: r.updatedAt, changeFrequency: "weekly" as const, priority: 0.6 })),
-    ...orgs.map((o) => ({ url: appUrl(`/v/${o.slug}`), lastModified: now, changeFrequency: "weekly" as const, priority: 0.5 })),
+    ...orgs.map((o) => ({ url: appUrl(`/v/${o.slug}`), changeFrequency: "weekly" as const, priority: 0.5 })),
   ];
 }

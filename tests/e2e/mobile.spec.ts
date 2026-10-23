@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { setupLandlord, uid } from "./utils";
 
-for (const path of ["/", "/preise", "/loesungen/eventraeume", "/registrieren"]) {
+for (const path of ["/", "/preise", "/loesungen/eventraeume", "/registrieren", "/demo", "/so-funktionierts"]) {
   test(`Mobil: ${path} ohne horizontales Scrollen und mit Menü`, async ({ page }) => {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
