@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bookFirstSlot, db, linkFromMail, login, mailTemplates, setupLandlord, uid } from "./utils";
+import { bookFirstSlot, db, linkFromMail, login, mailTemplates, register, setupLandlord, uid } from "./utils";
 
 test.describe.configure({ mode: "serial" });
 
@@ -12,6 +12,26 @@ test("Vermieterin registriert sich, richtet Raum ein, schliesst Abo ab und verö
   await page.goto(`/r/${slug}`);
   await expect(page.getByRole("heading", { level: 1, name: "Saal Seeblick" })).toBeVisible();
   await expect.poll(() => mailTemplates(email)).toEqual(expect.arrayContaining(["auth.verify_email", "subscription.started"]));
+});
+
+test("Entwurf kann ohne Rechnungsadresse fortgesetzt und privat ohne Buchungsfunktion angesehen werden", async ({ page }) => {
+  const draftEmail = `entwurf-${uid()}@example.ch`;
+  await register(page, { email: draftEmail, company: `Atelier ${uid()}` });
+  await page.getByRole("button", { name: "Weiter" }).click();
+  await page.getByLabel("Name des Raums").fill("Atelier Vorschau");
+  await page.getByLabel("Ort", { exact: true }).fill("Bern");
+  await page.getByLabel("Preis pro Stunde (CHF)").fill("75");
+  await page.getByRole("button", { name: "Raum erstellen" }).click();
+  await expect(page.getByRole("heading", { name: "Wählen Sie Ihren Tarif" })).toBeVisible();
+  await page.getByRole("link", { name: /Ohne Tarif fortfahren/ }).click();
+  await page.getByRole("button", { name: "Private Vorschau ansehen" }).click();
+  await expect(page.getByText(/Private Vorschau · Nur Ihr Team kann diese Seite sehen/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Atelier Vorschau" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Buchungsmaske inaktiv/ })).toBeDisabled();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await expect(page.getByRole("link", { name: "Buchungsseite fertig einrichten" }).first()).toBeVisible();
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(scrollWidth).toBeLessThanOrEqual(1);
 });
 
 test("Kunde bucht (Bezahlung vor Ort) und erhält Bestätigung; Vermieterin sieht Buchung", async ({ page, browser }) => {

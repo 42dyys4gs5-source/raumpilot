@@ -16,6 +16,7 @@ import { vatNote } from "@/lib/settings";
 import { cn } from "@/lib/utils/cn";
 import { subscribeAction } from "../(main)/abonnement/actions";
 import { finishOnboardingAction, onboardingProfileAction } from "./actions";
+import { recordFunnelEvent } from "@/lib/admin/funnel";
 
 export const metadata: Metadata = { title: "Einrichtung", robots: { index: false } };
 
@@ -28,6 +29,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const sp = await searchParams;
   let step = Number(sp.schritt ?? 0) || (!ctx ? 1 : rooms.length === 0 ? 1 : !ctx.plan ? 3 : 4);
   if (step > 1 && !ctx) step = 1;
+  if (step === 3 && ctx) await recordFunnelEvent("funnel.plan_selection_opened", ctx.org.id);
   const [plans, note] = await Promise.all([listPlans(), vatNote()]);
 
   return (
@@ -106,10 +108,12 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
             <CardBody>
               <CheckCircle2 className="size-10 text-emerald-600" />
               <h1 className="mt-3 text-2xl font-semibold">Fast geschafft</h1>
-              <p className="mt-1 text-ink-600">Ergänzen Sie Fotos, Zeiten und Regeln und veröffentlichen Sie Ihren Raum. Danach teilen Sie Ihren Link oder QR-Code.</p>
+              <p className="mt-1 text-ink-600">Sehen Sie zuerst Ihre private Buchungsseiten-Vorschau an. Fotos, Zeiten und weitere Regeln können Sie anschliessend in Ruhe ergänzen.</p>
               <div className="mt-6 flex flex-wrap gap-2">
+                {rooms[0] && <ButtonLink href={`/app/raeume/${rooms[0].id}/vorschau`}>Private Vorschau ansehen</ButtonLink>}
+                {rooms[0] && <ButtonLink href={`/app/raeume/${rooms[0].id}`} variant="secondary">Buchungsseite fertig einrichten</ButtonLink>}
                 {rooms[0] && <ButtonLink href={`/app/raeume/${rooms[0].id}?tab=fotos`}>Fotos hinzufügen</ButtonLink>}
-                {rooms[0] && <ButtonLink href={`/app/raeume/${rooms[0].id}?tab=veroeffentlichen`} variant="secondary">Veröffentlichen</ButtonLink>}
+                {rooms[0] && <ButtonLink href={`/app/raeume/${rooms[0].id}?tab=veroeffentlichen`} variant="ghost">Veröffentlichen</ButtonLink>}
                 <ButtonLink href="/app/buchungsseite" variant="secondary">Link & QR-Code</ButtonLink>
                 <ButtonLink href="/app/einnahmen" variant="ghost">Onlinezahlung einrichten</ButtonLink>
               </div>

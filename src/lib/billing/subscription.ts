@@ -6,6 +6,7 @@ import { enqueueEmail } from "@/lib/jobs/queue";
 import { gateway } from "@/lib/payments/gateway";
 import { type BillingInterval, listPlans, yearlyPrice } from "./entitlements";
 import { queueReferralReward } from "./referrals";
+import { recordFunnelEvent } from "@/lib/admin/funnel";
 
 type Org = typeof schema.organizations.$inferSelect;
 
@@ -173,6 +174,7 @@ export async function syncSubscription(s: SubscriptionData) {
       await enqueueEmail(tx, { to: owner.email, ...T.subscriptionEndedMail(owner.name), template: "subscription.ended", orgId: org.id }, `mail:sub-ended:${s.id}`);
     }
   });
+  if (["active", "trialing"].includes(s.status) && s.orgId) await recordFunnelEvent("funnel.subscription_activated", s.orgId, { planKey: s.planKeyHint });
 }
 
 export async function recordInvoice(i: InvoiceData, event: "paid" | "failed" | "updated") {

@@ -30,5 +30,15 @@ export async function platformMetrics() {
   const signups = (await db.execute(sql`
     SELECT to_char(date_trunc('week', created_at), 'YYYY-MM-DD') AS week, count(*)::int AS n FROM organizations
     WHERE created_at > now() - interval '12 weeks' GROUP BY 1 ORDER BY 1`)) as unknown as { week: string; n: number }[];
-  return { subs, orgs, bookings, rooms, errors, tickets, invoices, failed, churn, signups };
+  const funnel = (await db.execute(sql`
+    SELECT action,
+           CASE WHEN action = 'funnel.registration_started' THEN count(DISTINCT data->>'eventId')::int
+                ELSE count(DISTINCT org_id)::int END AS organisations
+    FROM audit_log
+    WHERE created_at > now() - interval '30 days'
+      AND action IN ('funnel.registration_started', 'user.registered', 'funnel.first_room_created', 'funnel.private_preview_viewed',
+                     'funnel.plan_selection_opened', 'billing.checkout_started',
+                     'funnel.subscription_activated', 'funnel.first_room_published')
+    GROUP BY action`)) as unknown as { action: string; organisations: number }[];
+  return { subs, orgs, bookings, rooms, errors, tickets, invoices, failed, churn, signups, funnel };
 }

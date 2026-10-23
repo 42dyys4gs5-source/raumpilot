@@ -53,3 +53,18 @@ npm run build && npm run test:e2e
 Durch die Tests gefundene und behobene Fehler (Auswahl): möglicher Verbindungs-Deadlock bei parallelen Buchungen, Admin-Weiterleitung nach 2FA ins Vermieter-Onboarding, verschwindende Erfolgsmeldungen nach Veröffentlichen/Annehmen/Stornieren, endlose Webhook-Wiederholungen bei Ereignissen fremder Stripe-Konten; Aktualisierung von sharp auf 0.35.5 (Sicherheitslücken in libvips).
 
 Bekannt: `npm audit` meldet PostCSS innerhalb von Next.js 15 (nur Build-Zeit, keine Benutzereingaben). Behebung mit dem Upgrade auf Next.js 16.
+
+## Prüfung der Self-Serve-Erweiterung (23. Oktober 2026)
+
+| Prüfung | Ergebnis |
+|---|---|
+| TypeScript (`npm run typecheck`) | bestanden |
+| ESLint (`npm run lint`) | bestanden |
+| Unit-Tests | **39 / 39 bestanden** |
+| Produktions-Build (`npm run build`) | erfolgreich |
+| Playwright: Rechnerseite und CHF-Berechnung | **2 / 2 bestanden** |
+| Desktop- und 390px-Mobile-Ansicht | HTTP 200, kein horizontaler Überlauf, keine Browserfehler |
+| Integrationstests | nicht ausführbar: PostgreSQL auf `localhost:5432` nicht erreichbar (`ECONNREFUSED`) |
+| vollständige Playwright-Suite | nicht ausführbar: E2E-Datenbank auf `localhost:5432` nicht erreichbar |
+
+Die neuen Registrierungs-, Vorschau- und Funnel-Integrationstests brauchen die E2E-PostgreSQL-Datenbank. Sie wurden in dieser Umgebung nicht ausgeführt. Der gezielte Rechner-E2E-Test lief ohne Datenbank gegen den Produktions-Build.

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/demo", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/ratgeber", "/registrieren"].map((p) => ({
+  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/demo", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/ratgeber", "/registrieren", "/tools/raum-umsatzrechner"].map((p) => ({
     url: appUrl(p),
     changeFrequency: "weekly" as const,
     priority: p === "/" ? 1 : 0.7,

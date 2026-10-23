@@ -222,6 +222,7 @@ export default async function Home() {
             <p className="mt-4 text-lg text-ink-600">Ein fixer Monatspreis. Keine Provision auf Ihre Buchungen.</p>
           </div>
           <div className="mt-10 sm:mt-12"><PlanCards plans={plans} hrefFor={(k) => `/registrieren?tarif=${k}`} ctaLabel="Kostenlos starten" vatNote={note} /></div>
+          <p className="mt-6 text-center text-sm text-ink-600">Möchten Sie zuerst selbst rechnen? <Link href="/tools/raum-umsatzrechner" className="font-medium text-brand-700 underline underline-offset-2">Zum kostenlosen Raum-Umsatzrechner</Link></p>
         </div>
       </section>
 

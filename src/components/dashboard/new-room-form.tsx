@@ -18,14 +18,14 @@ export function NewRoomForm({ next, defaultCity }: { next?: string; defaultCity?
             {ROOM_CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
           </Select>
         </Field>
-        <Field label="Ort" htmlFor="city">
-          <Input id="city" name="city" defaultValue={defaultCity ?? ""} />
+        <Field label="Ort" htmlFor="city" hint={next === "onboarding" ? "Der Ort erscheint auf Ihrer Raumseite." : undefined}>
+          <Input id="city" name="city" defaultValue={defaultCity ?? ""} required={next === "onboarding"} />
         </Field>
         <Field label="Max. Personen" htmlFor="capacity">
           <Input id="capacity" name="capacity" type="number" min={1} max={5000} defaultValue={20} required />
         </Field>
         <Field label="Preis pro Stunde (CHF)" htmlFor="hourlyPrice" hint="Halbtages- und Tagespreise können Sie danach ergänzen.">
-          <Input id="hourlyPrice" name="hourlyPrice" inputMode="decimal" placeholder="z. B. 60" />
+          <Input id="hourlyPrice" name="hourlyPrice" inputMode="decimal" placeholder="z. B. 60" required={next === "onboarding"} />
         </Field>
       </div>
       <SubmitButton>Raum erstellen</SubmitButton>

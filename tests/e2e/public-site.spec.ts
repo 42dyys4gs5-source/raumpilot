@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/loesungen/partyraeume", "/raeume", "/hilfe", "/hilfe/onlinezahlung", "/ratgeber", "/ratgeber/partyraum-vermieten", "/ratgeber/vereinslokal-vermieten", "/loesungen/gemeinschaftsraeume", "/rechtliches/datenschutz", "/rechtliches/impressum", "/registrieren", "/login"];
+const PAGES = ["/", "/funktionen", "/preise", "/so-funktionierts", "/faq", "/kontakt", "/loesungen", "/loesungen/partyraeume", "/raeume", "/hilfe", "/hilfe/onlinezahlung", "/ratgeber", "/ratgeber/partyraum-vermieten", "/ratgeber/vereinslokal-vermieten", "/loesungen/gemeinschaftsraeume", "/tools/raum-umsatzrechner", "/rechtliches/datenschutz", "/rechtliches/impressum", "/registrieren", "/login"];
 
 for (const path of PAGES) {
   test(`Seite ${path} lädt mit Titel und ohne Fehler`, async ({ page }) => {
@@ -18,11 +18,23 @@ test("SEO: sitemap, robots, canonical und strukturierte Daten", async ({ page, r
   const sm = await request.get("/sitemap.xml");
   expect(sm.status()).toBe(200);
   expect(await sm.text()).toContain("/loesungen/eventraeume");
+  expect(await sm.text()).toContain("/tools/raum-umsatzrechner");
   const robots = await request.get("/robots.txt");
   expect(await robots.text()).toContain("Disallow: /app");
   await page.goto("/faq");
   expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toBe("http://localhost:3100/faq");
   expect(await page.locator('script[type="application/ld+json"]').first().textContent()).toContain("FAQPage");
+});
+
+test("Umsatzrechner zeigt nachvollziehbare CHF-Schätzungen", async ({ page }) => {
+  await page.goto("/tools/raum-umsatzrechner");
+  await page.getByLabel("Mietpreis pro Stunde (CHF)").fill("100");
+  await page.getByLabel("Buchbare Stunden pro Woche").fill("10");
+  await page.getByLabel(/Erwartete Auslastung/).fill("50");
+  await page.getByLabel(/Monatliche Betriebskosten/).fill("500");
+  await expect(page.getByText("CHF 2’167.– / Monat").first()).toBeVisible();
+  await expect(page.getByText("CHF 1’667.– pro Monat")).toBeVisible();
+  await expect(page.getByText(/keine Umsatzgarantie/)).toBeVisible();
 });
 
 test("Kontaktformular erstellt eine Anfrage", async ({ page }) => {

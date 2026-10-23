@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Turnstile } from "@/components/ui/turnstile";
 import { ActionForm, FieldError, SubmitButton } from "@/components/ui/action-form";
-import { BotFields, Checkbox, Field, Input, Select } from "@/components/ui/form";
+import { BotFields, Checkbox, Field, Input } from "@/components/ui/form";
 import { Alert } from "@/components/ui/card";
+import { RegistrationStartedTracker } from "@/components/marketing/registration-started-tracker";
 import { findReferrer } from "@/lib/billing/referrals";
 import { env } from "@/lib/env";
 import { registerAction } from "../actions";
@@ -18,6 +19,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   const referrer = await findReferrer(ref).catch(() => null);
   return (
     <>
+      <RegistrationStartedTracker />
       <h1 className="text-2xl font-semibold">Konto erstellen</h1>
       <p className="mt-1 text-sm text-ink-500">
         {env.TRIAL_DAYS > 0 ? `${env.TRIAL_DAYS} Tage kostenlos testen. ` : ""}Bereits registriert?{" "}
@@ -50,39 +52,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           <Input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
           <FieldError name="password" />
         </Field>
-        <Field label="Telefon" htmlFor="phone" optional>
-          <Input id="phone" name="phone" type="tel" autoComplete="tel" />
-        </Field>
-        <fieldset className="space-y-4 rounded-xl border border-ink-200 p-4">
-          <legend className="px-1 text-sm font-medium text-ink-700">Rechnungsadresse</legend>
-          <Field label="Strasse und Nr." htmlFor="street">
-            <Input id="street" name="street" autoComplete="street-address" required />
-            <FieldError name="street" />
-          </Field>
-          <div className="grid grid-cols-[110px_1fr] gap-3">
-            <Field label="PLZ" htmlFor="postalCode">
-              <Input id="postalCode" name="postalCode" autoComplete="postal-code" required />
-            </Field>
-            <Field label="Ort" htmlFor="city">
-              <Input id="city" name="city" autoComplete="address-level2" required />
-            </Field>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Land" htmlFor="country">
-              <Select id="country" name="country" defaultValue="CH">
-                <option value="CH">Schweiz</option>
-                <option value="LI">Liechtenstein</option>
-                <option value="DE">Deutschland</option>
-                <option value="AT">Österreich</option>
-                <option value="FR">Frankreich</option>
-                <option value="IT">Italien</option>
-              </Select>
-            </Field>
-            <Field label="UID / MWST-Nr." htmlFor="vatNumber" optional>
-              <Input id="vatNumber" name="vatNumber" placeholder="CHE-123.456.789 MWST" />
-            </Field>
-          </div>
-        </fieldset>
+        <p className="rounded-xl bg-ink-50 p-4 text-sm leading-relaxed text-ink-600">Rechnungsadresse und MWST-Angaben benötigen wir erst, wenn Sie einen kostenpflichtigen Tarif auswählen. Sie können Ihren Raum vorher einrichten und privat ansehen.</p>
         <Checkbox
           name="terms"
           required

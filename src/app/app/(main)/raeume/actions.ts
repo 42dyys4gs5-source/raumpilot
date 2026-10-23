@@ -16,6 +16,7 @@ import { audit } from "@/lib/security/audit";
 import { deleteObject } from "@/lib/storage";
 import { storeImage, UploadError } from "@/lib/storage/images";
 import { parseMoney } from "@/lib/utils/money";
+import { recordFunnelEvent } from "@/lib/admin/funnel";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const int = (fd: FormData, k: string, def = 0) => {
@@ -38,12 +39,17 @@ function done(roomId: string, msg = "Gespeichert.") {
 
 export async function createRoomAction(_: ActionState, fd: FormData): Promise<ActionState> {
   const ctx = await requireOrg("admin");
+  const next = str(fd, "next");
   const name = str(fd, "name");
   const category = str(fd, "category") as (typeof ROOM_CATEGORIES)[number];
   if (name.length < 2) return fail("Bitte geben Sie einen Raumnamen an.", { name: "Erforderlich" });
   if (!ROOM_CATEGORIES.includes(category)) return fail("Bitte wählen Sie eine Kategorie.");
   const hourly = parseMoney(str(fd, "hourlyPrice"));
+  if (next === "onboarding" && !str(fd, "city")) return fail("Bitte geben Sie den Ort Ihres Raums an.", { city: "Erforderlich" });
+  if (next === "onboarding" && (hourly == null || hourly <= 0)) return fail("Bitte geben Sie einen gültigen Preis pro Stunde an.", { hourlyPrice: "Preis muss grösser als 0 sein" });
+  if (str(fd, "hourlyPrice") && (hourly == null || hourly <= 0)) return fail("Bitte geben Sie einen gültigen Preis grösser als 0 an.", { hourlyPrice: "Ungültig" });
   let room;
+  const [{ n: existingRooms }] = await db.select({ n: count() }).from(schema.rooms).where(eq(schema.rooms.orgId, ctx.org.id));
   try {
     room = await createRoom(ctx.org, {
       name,
@@ -57,7 +63,7 @@ export async function createRoomAction(_: ActionState, fd: FormData): Promise<Ac
     throw e;
   }
   await audit("room.created", { userId: ctx.user.id, orgId: ctx.org.id, data: { roomId: room.id } });
-  const next = str(fd, "next");
+  if (existingRooms === 0) await recordFunnelEvent("funnel.first_room_created", ctx.org.id, { roomId: room.id });
   redirect(next === "onboarding" ? `/app/onboarding?schritt=3` : `/app/raeume/${room.id}?neu=1`);
 }
 
@@ -256,6 +262,7 @@ export async function publishAction(_: ActionState, fd: FormData): Promise<Actio
     if (live >= (ctx.plan?.maxRooms ?? 0)) return fail("Ihr Tarif erlaubt keine weiteren veröffentlichten Räume.");
     await db.update(schema.rooms).set({ status: "published", publishedAt: room.publishedAt ?? new Date(), updatedAt: new Date() }).where(eq(schema.rooms.id, room.id));
     await audit("room.published", { userId: ctx.user.id, orgId: ctx.org.id, data: { roomId: room.id } });
+    await recordFunnelEvent("funnel.first_room_published", ctx.org.id, { roomId: room.id });
     revalidatePath(`/r/${room.slug}`);
     redirect(`/app/raeume/${room.id}?tab=veroeffentlichen&status=online`);
   }
