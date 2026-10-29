@@ -7,12 +7,14 @@ import { SOLUTIONS } from "@/content/solutions";
 import { ACCESS_STATUSES } from "@/lib/billing/entitlements";
 import { db, schema } from "@/lib/db";
 import { appUrl } from "@/lib/env";
+import { directoryHasListings } from "@/lib/rooms/directory";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/demo", "/faq", "/kontakt", "/loesungen", "/raeume", "/hilfe", "/ratgeber", "/registrieren", "/tools/raum-umsatzrechner"].map((p) => ({
+  const hasListings = await directoryHasListings();
+  const statics = ["/", "/funktionen", "/preise", "/so-funktionierts", "/demo", "/faq", "/kontakt", "/loesungen", ...(hasListings ? ["/raeume"] : []), "/hilfe", "/ratgeber", "/registrieren", "/tools/raum-umsatzrechner"].map((p) => ({
     url: appUrl(p),
     changeFrequency: "weekly" as const,
     priority: p === "/" ? 1 : 0.7,

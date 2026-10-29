@@ -8,6 +8,7 @@ import { db, schema } from "@/lib/db";
 import { ROOM_CATEGORIES, type RoomCategory } from "@/lib/db/schema";
 import { appUrl } from "@/lib/env";
 import { CATEGORY_LABELS } from "@/lib/rooms/constants";
+import { directoryHasListings } from "@/lib/rooms/directory";
 import { publicUrl } from "@/lib/storage";
 import { formatMoney } from "@/lib/utils/money";
 
@@ -16,11 +17,13 @@ type SP = Promise<{ kategorie?: string; ort?: string }>;
 export async function generateMetadata({ searchParams }: { searchParams: SP }): Promise<Metadata> {
   const sp = await searchParams;
   const cat = ROOM_CATEGORIES.find((c) => c === sp.kategorie);
+  // Ein leeres Verzeichnis soll nicht bei Google erscheinen.
+  const hasListings = await directoryHasListings();
   return {
     title: cat ? `${CATEGORY_LABELS[cat]} mieten – online buchen` : "Räume mieten – Raumverzeichnis",
     description: "Buchbare Event-, Party-, Seminar- und Proberäume, Studios und Sitzungszimmer – Verfügbarkeit prüfen und direkt beim Vermieter online buchen.",
     alternates: { canonical: appUrl(cat ? `/raeume?kategorie=${cat}` : "/raeume") },
-    robots: sp.ort ? { index: false } : undefined,
+    robots: sp.ort || !hasListings ? { index: false } : undefined,
   };
 }
 
@@ -39,6 +42,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: SP
     .limit(120);
   const list = rows.filter((r) => !r.suspended);
   const photos = list.length ? await db.select().from(schema.roomPhotos).where(inArray(schema.roomPhotos.roomId, list.map((r) => r.room.id))).orderBy(asc(schema.roomPhotos.sort)) : [];
+  if (!list.length && !cat && !sp.ort) return <DirectoryLaunching />;
   return (
     <>
       <PageHero eyebrow="Raumverzeichnis" title={cat ? `${CATEGORY_LABELS[cat]} mieten` : "Räume finden und direkt buchen"} intro="Alle hier gelisteten Räume sind direkt beim Vermieter online buchbar. Vermieter entscheiden selbst, ob ihre Räume hier erscheinen.">
@@ -76,6 +80,28 @@ export default async function DirectoryPage({ searchParams }: { searchParams: SP
               })}
             </div>
           )}
+        </div>
+      </section>
+    </>
+  );
+}
+
+// Solange noch kein Vermieter im Verzeichnis gelistet ist, richtet sich die
+// Seite an Vermieter statt eine leere Trefferliste zu zeigen.
+function DirectoryLaunching() {
+  return (
+    <>
+      <PageHero eyebrow="Raumverzeichnis" title="Das Raumverzeichnis startet bald" intro="Hier finden Mieterinnen und Mieter bald Event-, Seminar- und Proberäume, Studios und Sitzungszimmer, die direkt beim Vermieter online buchbar sind." />
+      <section className="py-14">
+        <div className="container-page">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-ink-200 bg-white p-8 text-center shadow-soft sm:p-10">
+            <h2 className="text-xl font-semibold text-ink-900">Sie vermieten einen Raum?</h2>
+            <p className="mt-2 text-ink-600">Gehören Sie zu den Ersten im Verzeichnis. Mit Raumvia erhalten Sie eine eigene Buchungsseite, auf Wunsch erscheinen Ihre Räume zusätzlich hier.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link href="/registrieren" className="inline-flex h-11 items-center rounded-lg bg-brand-700 px-5 text-sm font-medium text-white hover:bg-brand-800">14 Tage kostenlos testen</Link>
+              <Link href="/demo" className="inline-flex h-11 items-center rounded-lg px-5 text-sm font-medium text-ink-800 ring-1 ring-ink-200 hover:bg-ink-50">Demo ansehen</Link>
+            </div>
+          </div>
         </div>
       </section>
     </>
